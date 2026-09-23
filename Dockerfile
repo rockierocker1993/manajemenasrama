@@ -1,4 +1,4 @@
-FROM ghcr.io/cirruslabs/flutter:3.44.0 AS builder
+FROM ghcr.io/cirruslabs/flutter:3.13.4
 
 WORKDIR /app
 
@@ -10,12 +10,9 @@ COPY . .
 
 RUN flutter build web --release
 
-
 FROM nginx:alpine
 
-COPY nginx.conf /etc/nginx/conf.d/default.conf
-
-COPY --from=builder /app/build/web /usr/share/nginx/html
+COPY --from=0 /app/build/web /usr/share/nginx/html
 
 EXPOSE 80
 
