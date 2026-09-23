@@ -1,0 +1,9 @@
+services:
+  flutter-web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: flutter-web
+    ports:
+      - "8080:80"
+    restart: unless-stopped
