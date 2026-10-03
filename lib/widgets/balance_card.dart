@@ -61,7 +61,7 @@ class BalanceCard extends StatelessWidget {
                     style: TextStyle(color: Colors.white70),
                   ),
                   Text(
-                    "IKHSAN FADLY",
+                    "MISSI LANI",
                     style: TextStyle(color: Colors.white),
                   ),
                 ],

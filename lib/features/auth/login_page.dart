@@ -6,10 +6,11 @@ import '../../core/constants/app_colors.dart';
 import '../../services/auth_service.dart';
 import '../../widgets/app_logo.dart';
 import 'widgets/custom_text_field.dart';
-import '../dashboard/dashboard_page.dart';
 
 class LoginPage extends StatefulWidget {
-  const LoginPage({super.key});
+  const LoginPage({super.key, required this.authService});
+
+  final AuthService authService;
 
   @override
   State<LoginPage> createState() => _LoginPageState();
@@ -19,29 +20,33 @@ class _LoginPageState extends State<LoginPage> {
   final usernameController = TextEditingController();
   final passwordController = TextEditingController();
 
-  final authService = AuthService();
-
   bool obscure = true;
   bool loading = false;
 
   Future<void> login() async {
     setState(() => loading = true);
-
-    final success = await authService.login(
-      email: usernameController.text,
-      password: passwordController.text,
-    );
-
-    setState(() => loading = false);
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(
-        builder: (_) => const DashboardPage(),
-      ),
-    );
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(success ? "Login berhasil" : "Login gagal")),
-    );
+    try {
+      await widget.authService.login(
+        username: usernameController.text,
+        password: passwordController.text,
+      );
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Login berhasil')),
+      );
+    } on AppAuthException catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(e.message)),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Login gagal: $e')),
+      );
+    } finally {
+      if (mounted) setState(() => loading = false);
+    }
   }
 
   @override
@@ -67,16 +72,16 @@ class _LoginPageState extends State<LoginPage> {
                     width: 420,
                     padding: const EdgeInsets.all(30),
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.15),
+                      color: Colors.white.withValues(alpha: 0.15),
                       borderRadius: BorderRadius.circular(30),
-                      border: Border.all(color: Colors.white.withOpacity(0.2)),
+                      border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
                     ),
                     child: Column(
                       children: [
                         const AppLogo(),
                         const SizedBox(height: 24),
                         const Text(
-                          "Welcome Back",
+                          'Welcome Back',
                           style: TextStyle(
                             fontSize: 30,
                             fontWeight: FontWeight.bold,
@@ -85,21 +90,21 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                         const SizedBox(height: 8),
                         Text(
-                          "Sign in to continue",
+                          'Sign in to continue',
                           style: TextStyle(
-                            color: Colors.white.withOpacity(0.85),
+                            color: Colors.white.withValues(alpha: 0.85),
                           ),
                         ),
                         const SizedBox(height: 30),
                         CustomTextField(
                           controller: usernameController,
-                          hint: "Username",
+                          hint: 'Username',
                           icon: Icons.verified_user,
                         ),
                         const SizedBox(height: 18),
                         CustomTextField(
                           controller: passwordController,
-                          hint: "Password",
+                          hint: 'Password',
                           icon: Icons.lock_outline,
                           obscure: obscure,
                           suffix: IconButton(
@@ -117,7 +122,7 @@ class _LoginPageState extends State<LoginPage> {
                           child: TextButton(
                             onPressed: () {},
                             child: const Text(
-                              "Forgot Password?",
+                              'Forgot Password?',
                               style: TextStyle(color: Colors.white),
                             ),
                           ),
@@ -137,10 +142,9 @@ class _LoginPageState extends State<LoginPage> {
                             ),
                             child: loading
                                 ? const CircularProgressIndicator()
-                                : const Text("LOGIN"),
+                                : const Text('LOGIN'),
                           ),
                         ),
-
                         const SizedBox(height: 20),
                       ],
                     ),

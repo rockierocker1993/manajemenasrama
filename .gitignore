@@ -46,3 +46,9 @@ app.*.map.json
 
 # Widget Preview related
 .widget_preview/
+
+# Supabase keys / local env — never commit real values
+env/*.json
+!env/*.json.example
+*.env
+.env*

@@ -1,0 +1,28 @@
+# Generated / platform / lockfiles — skip for AI context
+build/
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+pubspec.lock
+
+# Platform scaffolds (edit directly only when needed)
+android/gradle/
+android/.gradle/
+android/gradlew
+android/gradlew.bat
+android/local.properties
+ios/Pods/
+ios/.symlinks/
+
+# Generated Dart sources
+**/*.g.dart
+**/*.freezed.dart
+**/*.mocks.dart
+
+# IDE
+.idea/
+*.iml
+
+# Web build artifacts
+web/icons/
+

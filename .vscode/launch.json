@@ -1,0 +1,30 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Flutter · Chrome (dev)",
+      "request": "launch",
+      "type": "dart",
+      "deviceId": "chrome",
+      "program": "lib/main.dart",
+      "toolArgs": ["--dart-define-from-file=env/dev.json"]
+    },
+    {
+      "name": "Flutter · Chrome (dev, profile)",
+      "request": "launch",
+      "type": "dart",
+      "deviceId": "chrome",
+      "flutterMode": "profile",
+      "program": "lib/main.dart",
+      "toolArgs": ["--dart-define-from-file=env/dev.json"]
+    },
+    {
+      "name": "Flutter · Android (dev)",
+      "request": "launch",
+      "type": "dart",
+      "program": "lib/main.dart",
+      "toolArgs": ["--dart-define-from-file=env/dev.json"]
+    }
+  ]
+}
+
