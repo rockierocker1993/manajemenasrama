@@ -121,4 +121,37 @@ class UserService {
       throw Exception(br.message ?? 'Gagal menghapus pengguna');
     return br;
   }
+
+  /// Update the current authenticated user's profile (PUT /api/users/me)
+  /// If the backend returns a new access token in the response data the
+  /// in-memory and persisted session will be replaced via [AuthService].
+  Future<BaseResponse<dynamic>> updateMe({
+    required String username,
+    required String fullName,
+    String? password,
+  }) async {
+    final res = await _api.putJson('/api/users/me', {
+      'username': username.trim(),
+      'full_name': fullName.trim(),
+      if (password != null && password.isNotEmpty) 'password': password,
+    });
+
+    final br = BaseResponse<dynamic>.fromJson(res, (d) => d);
+    if (br.status == false) {
+      throw Exception(br.message ?? 'Gagal memperbarui profil');
+    }
+
+    // If backend returned data with a new access_token, replace session.
+    try {
+      final data = br.data;
+      if (data is Map && data['access_token'] != null && data['access_token'].toString().isNotEmpty) {
+        await _authService.replaceSessionFromResponse(username: username.trim(), responseData: Map<String, dynamic>.from(data as Map));
+      }
+    } catch (_) {
+      // If token replacement fails, propagate as exception so caller can handle.
+      rethrow;
+    }
+
+    return br;
+  }
 }

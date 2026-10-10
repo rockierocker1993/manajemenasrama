@@ -13,6 +13,7 @@ import '../../services/asrama_service.dart';
 import '../users/users_page.dart';
 import '../asrama/asrama_page.dart';
 import '../jadwal_kegiatan/jadwal_kegiatan_page.dart';
+import '../profile/update_profile_page.dart';
 
 import 'package:manajemenasrama/features/jadwal_kegiatan/jadwal_kegiatan_by_day_page.dart'
     as byday_page;
@@ -81,162 +82,164 @@ class _DashboardPageState extends State<DashboardPage> {
           ),
         ],
       ),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  const CircleAvatar(
-                    radius: 28,
-                    backgroundColor: AppColors.primary,
-                    child: Icon(Icons.person, color: Colors.white),
-                  ),
-                  const SizedBox(width: 15),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+      body: currentIndex == 1
+          ? UpdateProfilePage(service: _userService)
+          : SafeArea(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
                       children: [
-                        const Text(
-                          'Selamat Datang',
-                          style: TextStyle(color: Colors.grey),
+                        const CircleAvatar(
+                          radius: 28,
+                          backgroundColor: AppColors.primary,
+                          child: Icon(Icons.person, color: Colors.white),
                         ),
-                        SizedBox(height: 2),
-                        FutureBuilder<Profile>(
-                          future: _futureProfile,
-                          builder: (context, snapshot) {
-                            if (snapshot.connectionState ==
-                                ConnectionState.waiting) {
-                              return const Text(
-                                'Loading...',
-                                style: TextStyle(
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold,
+                        const SizedBox(width: 15),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text(
+                                'Selamat Datang',
+                                style: TextStyle(color: Colors.grey),
+                              ),
+                              SizedBox(height: 2),
+                              FutureBuilder<Profile>(
+                                future: _futureProfile,
+                                builder: (context, snapshot) {
+                                  if (snapshot.connectionState ==
+                                      ConnectionState.waiting) {
+                                    return const Text(
+                                      'Loading...',
+                                      style: TextStyle(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    );
+                                  }
+
+                                  if (snapshot.hasError) {
+                                    return const Text(
+                                      'User',
+                                      style: TextStyle(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    );
+                                  }
+
+                                  final profile = snapshot.data;
+
+                                  return Text(
+                                    profile?.fullName ?? 'User',
+                                    style: const TextStyle(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  );
+                                },
+                              ),
+                            ],
+                          ),
+                        ),
+                        IconButton(
+                          onPressed: _logout,
+                          icon: const Icon(Icons.logout),
+                          tooltip: 'Logout',
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 24),
+                    FutureBuilder<List<JadwalKegiatanList>>(
+                      future: _futureNextJadwalKegiatan,
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState == ConnectionState.waiting) {
+                          return const Center(child: CircularProgressIndicator());
+                        }
+
+                        if (snapshot.hasError) {
+                          return const Text('Gagal memuat jadwal kegiatan');
+                        }
+
+                        return JadwalKegiatanCard(
+                          jadwal: snapshot.data ?? [],
+                          onTap: () {
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (_) => byday_page.JadwalKegiatanByDayPage(
+                                  service: _jadwalKegiatanService,
                                 ),
-                              );
-                            }
-
-                            if (snapshot.hasError) {
-                              return const Text(
-                                'User',
-                                style: TextStyle(
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold,
+                              ),
+                            );
+                          },
+                        );
+                      },
+                    ), // Placeholder for the next activity card
+                    const SizedBox(height: 28),
+                    const Text(
+                      "Menu",
+                      style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(height: 18),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        QuickAction(
+                          icon: Icons.manage_accounts_outlined,
+                          label: "Pengguna",
+                          onTap: () {
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (_) =>
+                                    UsersPage(userService: widget.userService),
+                              ),
+                            );
+                          },
+                        ),
+                        QuickAction(
+                          icon: Icons.home_outlined,
+                          label: "Asrama",
+                          onTap: () {
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (_) => AsramaPage(
+                                  service: AsramaService(
+                                    authService: widget.authService,
+                                  ),
                                 ),
-                              );
-                            }
-
-                            final profile = snapshot.data;
-
-                            return Text(
-                              profile?.fullName ?? 'User',
-                              style: const TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
+                              ),
+                            );
+                          },
+                        ),
+                        QuickAction(
+                          icon: Icons.task_alt_sharp,
+                          label: "Ijin & Sakit",
+                          notificationCount: 10,
+                        ),
+                        QuickAction(
+                          icon: Icons.receipt_long_outlined,
+                          label: "Jadwal Kegiatan",
+                          onTap: () {
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (_) => JadwalKegiatanPage(
+                                  service: JadwalKegiatanService(
+                                    authService: widget.authService,
+                                  ),
+                                ),
                               ),
                             );
                           },
                         ),
                       ],
                     ),
-                  ),
-                  IconButton(
-                    onPressed: _logout,
-                    icon: const Icon(Icons.logout),
-                    tooltip: 'Logout',
-                  ),
-                ],
+                  ],
+                ),
               ),
-              const SizedBox(height: 24),
-              FutureBuilder<List<JadwalKegiatanList>>(
-                future: _futureNextJadwalKegiatan,
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Center(child: CircularProgressIndicator());
-                  }
-
-                  if (snapshot.hasError) {
-                    return const Text('Gagal memuat jadwal kegiatan');
-                  }
-
-                  return JadwalKegiatanCard(
-                    jadwal: snapshot.data ?? [],
-                    onTap: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (_) => byday_page.JadwalKegiatanByDayPage(
-                            service: _jadwalKegiatanService,
-                          ),
-                        ),
-                      );
-                    },
-                  );
-                },
-              ), // Placeholder for the next activity card
-              const SizedBox(height: 28),
-              const Text(
-                "Menu",
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 18),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  QuickAction(
-                    icon: Icons.manage_accounts_outlined,
-                    label: "Pengguna",
-                    onTap: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (_) =>
-                              UsersPage(userService: widget.userService),
-                        ),
-                      );
-                    },
-                  ),
-                  QuickAction(
-                    icon: Icons.home_outlined,
-                    label: "Asrama",
-                    onTap: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (_) => AsramaPage(
-                            service: AsramaService(
-                              authService: widget.authService,
-                            ),
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-                  QuickAction(
-                    icon: Icons.task_alt_sharp,
-                    label: "Ijin & Sakit",
-                    notificationCount: 10,
-                  ),
-                  QuickAction(
-                    icon: Icons.receipt_long_outlined,
-                    label: "Jadwal Kegiatan",
-                    onTap: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (_) => JadwalKegiatanPage(
-                            service: JadwalKegiatanService(
-                              authService: widget.authService,
-                            ),
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
-      ),
+            ),
     );
   }
 }

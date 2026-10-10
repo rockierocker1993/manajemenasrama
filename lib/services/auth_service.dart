@@ -111,4 +111,24 @@ class AuthService {
   }
 
   Future<String?> bearerToken() async => _session?.accessToken;
+
+  /// Replace the current session using a login-like response payload.
+  ///
+  /// The `responseData` should be the `data` object returned by the backend
+  /// after authentication or profile update (contains access_token, expires_in, etc.).
+  /// This method will validate the token, persist it using the existing
+  /// SessionStorage implementation and update in-memory session state.
+  Future<void> replaceSessionFromResponse({
+    required String username,
+    required Map<String, dynamic> responseData,
+  }) async {
+    final token = Token.fromLoginResponse(username: username, json: {'data': responseData});
+    if (token.accessToken.isEmpty) {
+      throw AppAuthException('Token tidak diterima dari server');
+    }
+
+    _session = token;
+    await _storage.save(token);
+    _controller.add(token);
+  }
 }
