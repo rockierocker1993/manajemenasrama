@@ -1,4 +1,4 @@
-﻿import '../core/backend/backend_api_client.dart';
+import '../core/backend/backend_api_client.dart';
 import '../shared/models/profile.dart';
 import '../shared/models/base_response.dart';
 import '../shared/models/user_role.dart';
@@ -27,7 +27,10 @@ class UserService {
     // Support both wrapped responses ({ data: [...] }) and raw arrays.
     List itemsRaw;
     if (raw is Map<String, dynamic>) {
-      final br = BaseResponse<List<dynamic>>.fromJson(raw, (d) => (d as List).cast());
+      final br = BaseResponse<List<dynamic>>.fromJson(
+        raw,
+        (d) => (d as List).cast(),
+      );
       itemsRaw = br.data ?? <dynamic>[];
       if (br.status == false) {
         throw Exception(br.message ?? 'Gagal memuat pengguna');
@@ -45,8 +48,12 @@ class UserService {
   Future<Profile> me() async {
     final raw = await _api.getJson('/api/users/me');
     if (raw is Map<String, dynamic>) {
-      final br = BaseResponse<Map<String, dynamic>>.fromJson(raw, (d) => Map<String, dynamic>.from(d as Map));
-      if (br.status == false) throw Exception(br.message ?? 'Gagal memuat profil');
+      final br = BaseResponse<Map<String, dynamic>>.fromJson(
+        raw,
+        (d) => Map<String, dynamic>.from(d as Map),
+      );
+      if (br.status == false)
+        throw Exception(br.message ?? 'Gagal memuat profil');
       final payload = br.data ?? <String, dynamic>{};
       return Profile.fromJson(payload);
     }
@@ -110,7 +117,8 @@ class UserService {
     final res = await _api.delete('/api/users/$username');
     if (res == null) return null;
     final br = BaseResponse<dynamic>.fromJson(res, (d) => d);
-    if (br.status == false) throw Exception(br.message ?? 'Gagal menghapus pengguna');
+    if (br.status == false)
+      throw Exception(br.message ?? 'Gagal menghapus pengguna');
     return br;
   }
 }

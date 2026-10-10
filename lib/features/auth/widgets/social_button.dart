@@ -13,9 +13,7 @@ class SocialButton extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white.withOpacity(0.15),
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(
-          color: Colors.white.withOpacity(0.2),
-        ),
+        border: Border.all(color: Colors.white.withOpacity(0.2)),
       ),
       child: Icon(icon, color: Colors.white),
     );

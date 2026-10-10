@@ -31,19 +31,16 @@ class _LoginPageState extends State<LoginPage> {
         password: passwordController.text,
       );
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Login berhasil')),
-      );
+      ScaffoldMessenger.of(context)
+          .showSnackBar(const SnackBar(content: Text('Login berhasil')));
     } on AppAuthException catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(e.message)),
-      );
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(e.message)));
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Login gagal: $e')),
-      );
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text('Login gagal: $e')));
     } finally {
       if (mounted) setState(() => loading = false);
     }
@@ -74,7 +71,9 @@ class _LoginPageState extends State<LoginPage> {
                     decoration: BoxDecoration(
                       color: Colors.white.withValues(alpha: 0.15),
                       borderRadius: BorderRadius.circular(30),
-                      border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
+                      border: Border.all(
+                        color: Colors.white.withValues(alpha: 0.2),
+                      ),
                     ),
                     child: Column(
                       children: [
@@ -117,7 +116,7 @@ class _LoginPageState extends State<LoginPage> {
                             ),
                           ),
                         ),
-                       const SizedBox(height: 10),
+                        const SizedBox(height: 10),
                         SizedBox(
                           width: double.infinity,
                           height: 55,

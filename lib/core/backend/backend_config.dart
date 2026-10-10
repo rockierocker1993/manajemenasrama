@@ -7,4 +7,3 @@ class BackendConfig {
 
   static bool get isConfigured => baseUrl.isNotEmpty;
 }
-

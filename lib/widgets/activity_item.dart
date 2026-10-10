@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 class ActivityItem extends StatelessWidget {
-
   final String title;
   final String subtitle;
   final String amount;
@@ -19,15 +18,12 @@ class ActivityItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     return Card(
       elevation: 0,
 
       margin: const EdgeInsets.only(bottom: 12),
 
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(18),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
 
       child: ListTile(
         leading: CircleAvatar(
@@ -41,10 +37,7 @@ class ActivityItem extends StatelessWidget {
 
         trailing: Text(
           amount,
-          style: TextStyle(
-            color: color,
-            fontWeight: FontWeight.bold,
-          ),
+          style: TextStyle(color: color, fontWeight: FontWeight.bold),
         ),
       ),
     );

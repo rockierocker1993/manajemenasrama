@@ -17,9 +17,7 @@ class SessionStorage {
     final raw = prefs.getString(_token_key);
     if (raw == null || raw.isEmpty) return null;
     try {
-      return Token.fromJson(
-        Map<String, dynamic>.from(jsonDecode(raw) as Map),
-      );
+      return Token.fromJson(Map<String, dynamic>.from(jsonDecode(raw) as Map));
     } catch (_) {
       return null;
     }
@@ -30,4 +28,3 @@ class SessionStorage {
     await prefs.remove(_token_key);
   }
 }
-

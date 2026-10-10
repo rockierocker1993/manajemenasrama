@@ -13,6 +13,10 @@ import '../../services/asrama_service.dart';
 import '../users/users_page.dart';
 import '../asrama/asrama_page.dart';
 import '../jadwal_kegiatan/jadwal_kegiatan_page.dart';
+
+import 'package:manajemenasrama/features/jadwal_kegiatan/jadwal_kegiatan_by_day_page.dart'
+    as byday_page;
+
 import '../../services/jadwal_kegiatan_service.dart';
 
 class DashboardPage extends StatefulWidget {
@@ -20,7 +24,7 @@ class DashboardPage extends StatefulWidget {
     super.key,
     required this.authService,
     required this.userService,
-    required this.jadwalKegiatanService
+    required this.jadwalKegiatanService,
   });
 
   final AuthService authService;
@@ -150,9 +154,7 @@ class _DashboardPageState extends State<DashboardPage> {
                 future: _futureNextJadwalKegiatan,
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Center(
-                      child: CircularProgressIndicator(),
-                    );
+                    return const Center(child: CircularProgressIndicator());
                   }
 
                   if (snapshot.hasError) {
@@ -162,7 +164,13 @@ class _DashboardPageState extends State<DashboardPage> {
                   return JadwalKegiatanCard(
                     jadwal: snapshot.data ?? [],
                     onTap: () {
-                      // Navigasi ke halaman jadwal kegiatan
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => byday_page.JadwalKegiatanByDayPage(
+                            service: _jadwalKegiatanService,
+                          ),
+                        ),
+                      );
                     },
                   );
                 },
@@ -195,7 +203,9 @@ class _DashboardPageState extends State<DashboardPage> {
                       Navigator.of(context).push(
                         MaterialPageRoute(
                           builder: (_) => AsramaPage(
-                            service: AsramaService(authService: widget.authService),
+                            service: AsramaService(
+                              authService: widget.authService,
+                            ),
                           ),
                         ),
                       );
@@ -213,15 +223,16 @@ class _DashboardPageState extends State<DashboardPage> {
                       Navigator.of(context).push(
                         MaterialPageRoute(
                           builder: (_) => JadwalKegiatanPage(
-                            service: JadwalKegiatanService(authService: widget.authService),
+                            service: JadwalKegiatanService(
+                              authService: widget.authService,
+                            ),
                           ),
                         ),
                       );
-                    }
+                    },
                   ),
                 ],
               ),
-
             ],
           ),
         ),

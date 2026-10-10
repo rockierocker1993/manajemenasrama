@@ -29,7 +29,9 @@ class JadwalKegiatanList {
 
   factory JadwalKegiatanList.fromJson(Map<String, dynamic> json) {
     return JadwalKegiatanList(
-      id: json['id'] is int ? json['id'] as int : int.tryParse(json['id']?.toString() ?? ''),
+      id: json['id'] is int
+          ? json['id'] as int
+          : int.tryParse(json['id']?.toString() ?? ''),
       nama: json['nama']?.toString() ?? '',
       deskripsi: json['deskripsi']?.toString(),
       kategori: json['kategori']?.toString(),
@@ -38,7 +40,12 @@ class JadwalKegiatanList {
         if (raw == null) return null;
         if (raw is List) return raw.map((e) => e.toString()).toList();
         final s = raw.toString();
-        if (s.contains(',')) return s.split(',').map((e) => e.trim()).where((e) => e.isNotEmpty).toList();
+        if (s.contains(','))
+          return s
+              .split(',')
+              .map((e) => e.trim())
+              .where((e) => e.isNotEmpty)
+              .toList();
         // single value as string separated by commas or single token
         return [s];
       }(),
@@ -52,7 +59,12 @@ class JadwalKegiatanList {
         if (raw == null) return null;
         if (raw is List) return raw.map((e) => e.toString()).toList();
         final s = raw.toString();
-        if (s.contains(',')) return s.split(',').map((e) => e.trim()).where((e) => e.isNotEmpty).toList();
+        if (s.contains(','))
+          return s
+              .split(',')
+              .map((e) => e.trim())
+              .where((e) => e.isNotEmpty)
+              .toList();
         // single value as string separated by commas or single token
         return [s];
       }(),
@@ -61,10 +73,15 @@ class JadwalKegiatanList {
         if (raw == null) return null;
         if (raw is List) return raw.map((e) => e.toString()).toList();
         final s = raw.toString();
-        if (s.contains(',')) return s.split(',').map((e) => e.trim()).where((e) => e.isNotEmpty).toList();
+        if (s.contains(','))
+          return s
+              .split(',')
+              .map((e) => e.trim())
+              .where((e) => e.isNotEmpty)
+              .toList();
         // single value as string separated by commas or single token
         return [s];
-      }()
+      }(),
     );
   }
 
@@ -77,15 +94,18 @@ class JadwalKegiatanList {
     if (hari != null) out['hari'] = hari;
     if (jamAwal != null) out['jam_awal'] = jamAwal;
     if (jamAkhir != null) out['jam_akhir'] = jamAkhir;
-    if (tanggalAwalEfektif != null) out['tanggal_awal_efektif'] = tanggalAwalEfektif;
-    if (tanggalAkhirEfektif != null) out['tanggal_akhir_efektif'] = tanggalAkhirEfektif;
+    if (tanggalAwalEfektif != null)
+      out['tanggal_awal_efektif'] = tanggalAwalEfektif;
+    if (tanggalAkhirEfektif != null)
+      out['tanggal_akhir_efektif'] = tanggalAkhirEfektif;
     if (status != null) out['status'] = status;
-    if (jadwalKegiatanUsers != null) out['jadwal_kegiatan_users'] = jadwalKegiatanUsers;
-    if (jadwalKegiatanAsrama != null) out['jadwal_kegiatan_asrama'] = jadwalKegiatanAsrama;
+    if (jadwalKegiatanUsers != null)
+      out['jadwal_kegiatan_users'] = jadwalKegiatanUsers;
+    if (jadwalKegiatanAsrama != null)
+      out['jadwal_kegiatan_asrama'] = jadwalKegiatanAsrama;
     return out;
   }
 
   // helper copied inline to avoid unused import issues
   dynamic categoriaOrNull(String? v) => v;
 }
-

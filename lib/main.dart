@@ -45,7 +45,9 @@ class _MyAppState extends State<MyApp> {
   void initState() {
     super.initState();
     _userService = UserService(authService: widget.authService);
-    _jadwalKegiatanService = JadwalKegiatanService(authService: widget.authService);
+    _jadwalKegiatanService = JadwalKegiatanService(
+      authService: widget.authService,
+    );
     _session = widget.authService.currentSession;
     _scheduleExpiry(_session);
     _sub = widget.authService.onSessionChanged.listen((session) {
@@ -73,7 +75,8 @@ class _MyAppState extends State<MyApp> {
 
     _expiryTimer = Timer(Duration(seconds: ttl + 1), () async {
       if (widget.authService.isSessionExpired(
-          widget.authService.currentSession)) {
+        widget.authService.currentSession,
+      )) {
         await widget.authService.logout();
       } else {
         _scheduleExpiry(widget.authService.currentSession);
@@ -85,10 +88,10 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     final child = widget.authService.isLoggedIn
         ? DashboardPage(
-      authService: widget.authService,
-      userService: _userService,
-      jadwalKegiatanService: _jadwalKegiatanService,
-    )
+            authService: widget.authService,
+            userService: _userService,
+            jadwalKegiatanService: _jadwalKegiatanService,
+          )
         : LoginPage(authService: widget.authService);
 
     return MaterialApp(

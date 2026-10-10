@@ -397,7 +397,7 @@ class JadwalKegiatanCard extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      'Lihat semua jadwal',
+                      'Lihat semua jadwal saya',
                       style: TextStyle(fontWeight: FontWeight.w600),
                     ),
                     SizedBox(width: 8),

@@ -107,7 +107,9 @@ class _UserFormPageState extends State<UserFormPage> {
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(widget.isEdit ? 'Perubahan disimpan' : 'Pengguna dibuat'),
+          content: Text(
+            widget.isEdit ? 'Perubahan disimpan' : 'Pengguna dibuat',
+          ),
         ),
       );
     }
@@ -187,11 +189,15 @@ class _UserFormPageState extends State<UserFormPage> {
                 ),
                 // If editing a Super Admin, only show that value and disable
                 // changes. Otherwise, only show Pengurus and Ustadzah.
-                items: (isSuperAdminExisting
-                        ? [UserRole.superAdmin]
-                        : [UserRole.pengurus, UserRole.ustadzah])
-                    .map((r) => DropdownMenuItem(value: r, child: Text(r.label)))
-                    .toList(),
+                items:
+                    (isSuperAdminExisting
+                            ? [UserRole.superAdmin]
+                            : [UserRole.pengurus, UserRole.ustadzah])
+                        .map(
+                          (r) =>
+                              DropdownMenuItem(value: r, child: Text(r.label)),
+                        )
+                        .toList(),
                 onChanged: isSuperAdminExisting
                     ? null
                     : (v) => setState(() => _role = v ?? _role),

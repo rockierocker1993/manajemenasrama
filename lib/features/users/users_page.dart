@@ -65,11 +65,13 @@ class _UsersPageState extends State<UsersPage> {
     try {
       await _service.delete(user.username);
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Pengguna dihapus')));
+      ScaffoldMessenger.of(context)
+          .showSnackBar(const SnackBar(content: Text('Pengguna dihapus')));
       _reload();
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Gagal: $e')));
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text('Gagal: $e')));
     }
   }
 
@@ -144,10 +146,16 @@ class _UsersPageState extends State<UsersPage> {
                       if (v == 'edit') _openForm(existing: u);
                       if (v == 'delete') _confirmDelete(u);
                     },
-                    itemBuilder: (_) => u.role.label == UserRole.superAdmin.label ? const [] : const [
-                      PopupMenuItem(value: 'edit', child: Text('Edit')),
-                      PopupMenuItem(value: 'delete', child: Text('Hapus')),
-                    ],
+                    itemBuilder: (_) =>
+                        u.role.label == UserRole.superAdmin.label
+                        ? const []
+                        : const [
+                            PopupMenuItem(value: 'edit', child: Text('Edit')),
+                            PopupMenuItem(
+                              value: 'delete',
+                              child: Text('Hapus'),
+                            ),
+                          ],
                   ),
                   onTap: () => _openForm(existing: u),
                 );
@@ -159,4 +167,3 @@ class _UsersPageState extends State<UsersPage> {
     );
   }
 }
-

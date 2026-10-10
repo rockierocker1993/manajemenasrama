@@ -39,68 +39,73 @@ class _QuickActionState extends State<QuickAction> {
       },
       child: GestureDetector(
         onTap: widget.onTap,
-        child: Column(
-          children: [
-            Stack(
-              clipBehavior: Clip.none,
-              children: [
-                AnimatedContainer(
-                  duration: const Duration(milliseconds: 150),
-                  width: 62,
-                  height: 62,
-                  decoration: BoxDecoration(
-                    color: _isHovered
-                        ? AppColors.primary.withOpacity(.2)
-                        : AppColors.primary.withOpacity(.1),
-                    borderRadius: BorderRadius.circular(18),
+        child: SizedBox(
+          width: 88,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  AnimatedContainer(
+                    duration: const Duration(milliseconds: 150),
+                    width: 62,
+                    height: 62,
+                    decoration: BoxDecoration(
+                      color: _isHovered
+                          ? AppColors.primary.withOpacity(.2)
+                          : AppColors.primary.withOpacity(.1),
+                      borderRadius: BorderRadius.circular(18),
+                    ),
+                    child: Icon(widget.icon, color: AppColors.primary),
                   ),
-                  child: Icon(
-                    widget.icon,
-                    color: AppColors.primary,
-                  ),
-                ),
 
-                if (widget.notificationCount > 0)
-                  Positioned(
-                    top: -6,
-                    right: -6,
-                    child: Container(
-                      constraints: const BoxConstraints(
-                        minWidth: 20,
-                        minHeight: 20,
-                      ),
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 5,
-                        vertical: 2,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.red,
-                        borderRadius: BorderRadius.circular(10),
-                        border: Border.all(
-                          color: Colors.white,
-                          width: 2,
+                  if (widget.notificationCount > 0)
+                    Positioned(
+                      top: -6,
+                      right: -6,
+                      child: Container(
+                        constraints: const BoxConstraints(
+                          minWidth: 20,
+                          minHeight: 20,
                         ),
-                      ),
-                      child: Text(
-                        widget.notificationCount > 99
-                            ? '99+'
-                            : widget.notificationCount.toString(),
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 10,
-                          fontWeight: FontWeight.bold,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 5,
+                          vertical: 2,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.red,
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(color: Colors.white, width: 2),
+                        ),
+                        child: Text(
+                          widget.notificationCount > 99
+                              ? '99+'
+                              : widget.notificationCount.toString(),
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 10,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
                     ),
-                  ),
-              ],
-            ),
+                ],
+              ),
 
-            const SizedBox(height: 8),
+              const SizedBox(height: 8),
 
-            Text(widget.label),
-          ],
+              Flexible(
+                child: Text(
+                  widget.label,
+                  textAlign: TextAlign.center,
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 2,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

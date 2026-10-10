@@ -19,7 +19,9 @@ class AsramaFormPage extends StatefulWidget {
 
 class _AsramaFormPageState extends State<AsramaFormPage> {
   final _formKey = GlobalKey<FormState>();
-  late final TextEditingController _nama = TextEditingController(text: widget.existing?.nama ?? '');
+  late final TextEditingController _nama = TextEditingController(
+    text: widget.existing?.nama ?? '',
+  );
   bool _saving = false;
 
   @override
@@ -34,7 +36,10 @@ class _AsramaFormPageState extends State<AsramaFormPage> {
 
     final result = await runApiCall(() async {
       if (widget.isEdit) {
-        return await widget.service.update(id: widget.existing!.id, nama: _nama.text.trim());
+        return await widget.service.update(
+          id: widget.existing!.id,
+          nama: _nama.text.trim(),
+        );
       }
       return await widget.service.create(nama: _nama.text.trim());
     }, context);
@@ -55,7 +60,10 @@ class _AsramaFormPageState extends State<AsramaFormPage> {
         title: Text(title),
         content: Text(msg),
         actions: [
-          TextButton(onPressed: () => Navigator.of(context).pop(), child: const Text('OK')),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('OK'),
+          ),
         ],
       ),
     );
@@ -67,7 +75,9 @@ class _AsramaFormPageState extends State<AsramaFormPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(widget.isEdit ? 'Edit Asrama' : 'Tambah Asrama')),
+      appBar: AppBar(
+        title: Text(widget.isEdit ? 'Edit Asrama' : 'Tambah Asrama'),
+      ),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(16),
@@ -77,8 +87,12 @@ class _AsramaFormPageState extends State<AsramaFormPage> {
               children: [
                 TextFormField(
                   controller: _nama,
-                  decoration: const InputDecoration(labelText: 'Nama Asrama', border: OutlineInputBorder()),
-                  validator: (v) => (v ?? '').trim().isEmpty ? 'Nama wajib diisi' : null,
+                  decoration: const InputDecoration(
+                    labelText: 'Nama Asrama',
+                    border: OutlineInputBorder(),
+                  ),
+                  validator: (v) =>
+                      (v ?? '').trim().isEmpty ? 'Nama wajib diisi' : null,
                 ),
                 const SizedBox(height: 20),
                 SizedBox(
@@ -86,8 +100,19 @@ class _AsramaFormPageState extends State<AsramaFormPage> {
                   height: 48,
                   child: FilledButton.icon(
                     onPressed: _saving ? null : _save,
-                    icon: _saving ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white)) : const Icon(Icons.save),
-                    label: Text(widget.isEdit ? 'Simpan Perubahan' : 'Buat Asrama'),
+                    icon: _saving
+                        ? const SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: Colors.white,
+                            ),
+                          )
+                        : const Icon(Icons.save),
+                    label: Text(
+                      widget.isEdit ? 'Simpan Perubahan' : 'Buat Asrama',
+                    ),
                   ),
                 ),
               ],
@@ -98,4 +123,3 @@ class _AsramaFormPageState extends State<AsramaFormPage> {
     );
   }
 }
-

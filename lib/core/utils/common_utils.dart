@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 // Note: avoid calling intl initializeDateFormatting here to keep this util
 // synchronous and side-effect free. We format months manually in Indonesian.
 
@@ -52,7 +53,8 @@ DateTime? parseDateFlexible(String? input) {
 }
 
 /// Format a [DateTime] to an ISO-like yyyy-MM-dd string. Returns '-' for null.
-String formatDateIso(DateTime? d) => d == null ? '-' : d.toIso8601String().split('T').first;
+String formatDateIso(DateTime? d) =>
+    d == null ? '-' : d.toIso8601String().split('T').first;
 
 /// Format [TimeOfDay]. If [context] is provided uses Material localization
 /// (TimeOfDay.format). Otherwise returns "HH:mm".
@@ -78,8 +80,14 @@ Future<bool> showConfirmationDialog(
       title: Text(title),
       content: Text(content),
       actions: [
-        TextButton(onPressed: () => Navigator.of(ctx).pop(false), child: Text(cancelText)),
-        FilledButton.tonal(onPressed: () => Navigator.of(ctx).pop(true), child: Text(confirmText)),
+        TextButton(
+          onPressed: () => Navigator.of(ctx).pop(false),
+          child: Text(cancelText),
+        ),
+        FilledButton.tonal(
+          onPressed: () => Navigator.of(ctx).pop(true),
+          child: Text(confirmText),
+        ),
       ],
     ),
   );
@@ -92,18 +100,26 @@ List<String> parseHari(dynamic raw) {
   if (raw == null) return <String>[];
   if (raw is List) return raw.map((e) => e.toString()).toList();
   final s = raw.toString();
-  if (s.contains(',')) return s.split(',').map((e) => e.trim()).where((e) => e.isNotEmpty).toList();
+  if (s.contains(','))
+    return s
+        .split(',')
+        .map((e) => e.trim())
+        .where((e) => e.isNotEmpty)
+        .toList();
   return [s.trim()];
 }
 
 /// Convert list of hari numbers (as strings) to readable labels using [kCommonDayLabels].
 String hariListToLabels(List<String>? hari) {
   if (hari == null || hari.isEmpty) return '-';
-  return hari.map((d) {
-    final idx = int.tryParse(d.toString()) ?? 0;
-    if (idx >= 1 && idx <= kCommonDayLabels.length) return kCommonDayLabels[idx - 1];
-    return d.toString();
-  }).join(', ');
+  return hari
+      .map((d) {
+        final idx = int.tryParse(d.toString()) ?? 0;
+        if (idx >= 1 && idx <= kCommonDayLabels.length)
+          return kCommonDayLabels[idx - 1];
+        return d.toString();
+      })
+      .join(', ');
 }
 
 /// Extract list of ids from a list of maps: [{ 'id': 1}, ...]
@@ -113,7 +129,8 @@ List<int> extractIdsFromList(List<dynamic>? raw) {
   for (final e in raw) {
     try {
       final id = e is Map ? e['id'] : null;
-      if (id is int) out.add(id);
+      if (id is int)
+        out.add(id);
       else if (id is String) {
         final v = int.tryParse(id);
         if (v != null) out.add(v);
@@ -153,7 +170,7 @@ String formatTanggalEffektif(String? tanggal) {
       'September',
       'Oktober',
       'November',
-      'Desember'
+      'Desember',
     ];
 
     final day = dt.day.toString().padLeft(2, '0');
@@ -165,4 +182,3 @@ String formatTanggalEffektif(String? tanggal) {
     return tanggal;
   }
 }
-

@@ -15,29 +15,28 @@ class Profile {
   final UserRole role;
 
   factory Profile.fromJson(Map<String, dynamic> json) => Profile(
-        id: (json['id'] ?? '').toString(),
-        username: (json['username'] ?? '') as String,
-        fullName: (json['full_name'] ?? json['fullName'] ?? '') as String,
-        role: UserRole.fromWire((json['role'] ?? 'SUPER_ADMIN') as String),
-      );
+    id: (json['id'] ?? '').toString(),
+    username: (json['username'] ?? '') as String,
+    fullName: (json['full_name'] ?? json['fullName'] ?? '') as String,
+    role: UserRole.fromWire((json['role'] ?? 'SUPER_ADMIN') as String),
+  );
 
   Map<String, dynamic> toJson() => {
-        'id': id,
-        'username': username,
-        'full_name': fullName,
-        'role': role.wireValue,
-      };
+    'id': id,
+    'username': username,
+    'full_name': fullName,
+    'role': role.wireValue,
+  };
 
   Profile copyWith({
     String? id,
     String? username,
     String? fullName,
     UserRole? role,
-  }) =>
-      Profile(
-        id: id ?? this.id,
-        username: username ?? this.username,
-        fullName: fullName ?? this.fullName,
-        role: role ?? this.role,
-      );
+  }) => Profile(
+    id: id ?? this.id,
+    username: username ?? this.username,
+    fullName: fullName ?? this.fullName,
+    role: role ?? this.role,
+  );
 }

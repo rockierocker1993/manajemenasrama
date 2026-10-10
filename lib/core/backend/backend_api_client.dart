@@ -20,10 +20,8 @@ class BackendApiException implements Exception {
 }
 
 class BackendApiClient {
-  BackendApiClient({
-    http.Client? httpClient,
-    this._bearerTokenProvider,
-  }) : _http = httpClient ?? http.Client();
+  BackendApiClient({http.Client? httpClient, this._bearerTokenProvider})
+    : _http = httpClient ?? http.Client();
 
   final http.Client _http;
   final Future<String?> Function()? _bearerTokenProvider;
@@ -91,10 +89,12 @@ class BackendApiClient {
 
   String? _extractMessage(dynamic body) {
     if (body is Map) {
-      return (body['message_id'] ?? body['message_en'] ?? body['message'] ?? body['error'])
+      return (body['message_id'] ??
+              body['message_en'] ??
+              body['message'] ??
+              body['error'])
           ?.toString();
     }
     return null;
   }
 }
-

@@ -1,4 +1,4 @@
-﻿import 'dart:async';
+import 'dart:async';
 
 import 'package:http/http.dart' as http;
 
@@ -19,8 +19,8 @@ class AuthService {
     BackendApiClient? apiClient,
     SessionStorage? tokenStorage,
     http.Client? httpClient,
-  })  : _api = apiClient ?? BackendApiClient(httpClient: httpClient),
-        _storage = tokenStorage ?? SessionStorage();
+  }) : _api = apiClient ?? BackendApiClient(httpClient: httpClient),
+       _storage = tokenStorage ?? SessionStorage();
 
   final BackendApiClient _api;
   final SessionStorage _storage;
@@ -54,10 +54,10 @@ class AuthService {
     }
 
     try {
-      final response = await _api.postJson(
-        '/api/auth/login',
-        {'username': username.trim(), 'password': password},
-      );
+      final response = await _api.postJson('/api/auth/login', {
+        'username': username.trim(),
+        'password': password,
+      });
 
       final br = BaseResponse<Map<String, dynamic>>.fromJson(
         response,
@@ -69,7 +69,10 @@ class AuthService {
       }
 
       final sessionJson = br.data ?? {};
-      final session = Token.fromLoginResponse(username: username.trim(), json: {'data': sessionJson});
+      final session = Token.fromLoginResponse(
+        username: username.trim(),
+        json: {'data': sessionJson},
+      );
       if (session.accessToken.isEmpty) {
         throw AppAuthException('Token login tidak diterima');
       }
@@ -80,7 +83,9 @@ class AuthService {
       return session;
     } on BackendApiException catch (e) {
       final msg = e.message.toLowerCase();
-      if (e.statusCode == 401 || msg.contains('invalid') || msg.contains('salah')) {
+      if (e.statusCode == 401 ||
+          msg.contains('invalid') ||
+          msg.contains('salah')) {
         throw AppAuthException('Username atau password salah');
       }
       throw AppAuthException(e.message);

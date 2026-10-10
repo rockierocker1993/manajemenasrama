@@ -34,7 +34,8 @@ class _AsramaPageState extends State<AsramaPage> {
   Future<void> _openForm({Asrama? existing}) async {
     final changed = await Navigator.of(context).push<bool>(
       MaterialPageRoute(
-        builder: (_) => AsramaFormPage(service: widget.service, existing: existing),
+        builder: (_) =>
+            AsramaFormPage(service: widget.service, existing: existing),
       ),
     );
     if (changed == true) _reload();
@@ -47,8 +48,14 @@ class _AsramaPageState extends State<AsramaPage> {
         title: const Text('Hapus Asrama?'),
         content: Text('Asrama "${a.nama}" akan dihapus permanen.'),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Batal')),
-          FilledButton.tonal(onPressed: () => Navigator.pop(context, true), child: const Text('Hapus')),
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Batal'),
+          ),
+          FilledButton.tonal(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Hapus'),
+          ),
         ],
       ),
     );
@@ -61,7 +68,8 @@ class _AsramaPageState extends State<AsramaPage> {
     final title = res.titleEn ?? res.titleId ?? 'Sukses';
     final msg = res.message ?? res.messageEn ?? res.messageId ?? '';
     if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('$title: $msg')));
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text('$title: $msg')));
       _reload();
     }
   }
@@ -69,9 +77,7 @@ class _AsramaPageState extends State<AsramaPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Manajemen Asrama'),
-      ),
+      appBar: AppBar(title: const Text('Manajemen Asrama')),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => _openForm(),
         icon: const Icon(Icons.add),
@@ -92,7 +98,10 @@ class _AsramaPageState extends State<AsramaPage> {
                   Center(
                     child: Padding(
                       padding: const EdgeInsets.all(24),
-                      child: Text('Gagal memuat: ${snap.error}', textAlign: TextAlign.center),
+                      child: Text(
+                        'Gagal memuat: ${snap.error}',
+                        textAlign: TextAlign.center,
+                      ),
                     ),
                   ),
                 ],
@@ -100,7 +109,12 @@ class _AsramaPageState extends State<AsramaPage> {
             }
             final items = snap.data ?? const <Asrama>[];
             if (items.isEmpty) {
-              return ListView(children: const [SizedBox(height: 160), Center(child: Text('Belum ada asrama'))]);
+              return ListView(
+                children: const [
+                  SizedBox(height: 160),
+                  Center(child: Text('Belum ada asrama')),
+                ],
+              );
             }
             return ListView.separated(
               padding: const EdgeInsets.symmetric(vertical: 8),
@@ -131,4 +145,3 @@ class _AsramaPageState extends State<AsramaPage> {
     );
   }
 }
-

@@ -231,10 +231,7 @@ class _JadwalKegiatanPageState extends State<JadwalKegiatanPage> {
               );
             }
             return ListView.separated(
-              padding:  const EdgeInsets.only(
-                top: 8,
-                bottom: 80,
-              ),
+              padding: const EdgeInsets.only(top: 8, bottom: 80),
               itemCount: list.length,
               separatorBuilder: (_, __) => const Divider(height: 0),
               itemBuilder: (context, i) {

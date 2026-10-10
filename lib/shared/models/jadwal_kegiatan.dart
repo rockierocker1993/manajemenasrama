@@ -35,7 +35,9 @@ class JadwalKegiatan {
 
   factory JadwalKegiatan.fromJson(Map<String, dynamic> json) {
     return JadwalKegiatan(
-      id: json['id'] is int ? json['id'] as int : int.tryParse(json['id']?.toString() ?? ''),
+      id: json['id'] is int
+          ? json['id'] as int
+          : int.tryParse(json['id']?.toString() ?? ''),
       nama: json['nama']?.toString() ?? '',
       deskripsi: json['deskripsi']?.toString(),
       kategori: json['kategori']?.toString(),
@@ -44,7 +46,12 @@ class JadwalKegiatan {
         if (raw == null) return null;
         if (raw is List) return raw.map((e) => e.toString()).toList();
         final s = raw.toString();
-        if (s.contains(',')) return s.split(',').map((e) => e.trim()).where((e) => e.isNotEmpty).toList();
+        if (s.contains(','))
+          return s
+              .split(',')
+              .map((e) => e.trim())
+              .where((e) => e.isNotEmpty)
+              .toList();
         // single value as string separated by commas or single token
         return [s];
       }(),
@@ -58,19 +65,31 @@ class JadwalKegiatan {
       jadwalKegiatanUsers: () {
         final raw = json['jadwal_kegiatan_users'];
         if (raw == null) return null;
-        if (raw is List) return raw.map((e) => Map<String, dynamic>.from(e as Map)).toList();
+        if (raw is List)
+          return raw.map((e) => Map<String, dynamic>.from(e as Map)).toList();
         // if backend returns comma-separated names
         final s = raw.toString();
-        final parts = s.split(',').map((e) => e.trim()).where((e) => e.isNotEmpty).toList();
-        return parts.map((name) => <String, dynamic>{'full_name': name}).toList();
+        final parts = s
+            .split(',')
+            .map((e) => e.trim())
+            .where((e) => e.isNotEmpty)
+            .toList();
+        return parts
+            .map((name) => <String, dynamic>{'full_name': name})
+            .toList();
       }(),
       jadwalKegiatanAsramaString: json['jadwal_kegiatan_asrama']?.toString(),
       jadwalKegiatanAsrama: () {
         final raw = json['jadwal_kegiatan_asrama'];
         if (raw == null) return null;
-        if (raw is List) return raw.map((e) => Map<String, dynamic>.from(e as Map)).toList();
+        if (raw is List)
+          return raw.map((e) => Map<String, dynamic>.from(e as Map)).toList();
         final s = raw.toString();
-        final parts = s.split(',').map((e) => e.trim()).where((e) => e.isNotEmpty).toList();
+        final parts = s
+            .split(',')
+            .map((e) => e.trim())
+            .where((e) => e.isNotEmpty)
+            .toList();
         return parts.map((name) => <String, dynamic>{'nama': name}).toList();
       }(),
     );
@@ -85,18 +104,26 @@ class JadwalKegiatan {
     if (hari != null) out['hari'] = hari;
     if (jamAwal != null) out['jam_awal'] = jamAwal;
     if (jamAkhir != null) out['jam_akhir'] = jamAkhir;
-    if (tanggalAwalEfektif != null) out['tanggal_awal_efektif'] = tanggalAwalEfektif;
-    if (tanggalAkhirEfektif != null) out['tanggal_akhir_efektif'] = tanggalAkhirEfektif;
+    if (tanggalAwalEfektif != null)
+      out['tanggal_awal_efektif'] = tanggalAwalEfektif;
+    if (tanggalAkhirEfektif != null)
+      out['tanggal_akhir_efektif'] = tanggalAkhirEfektif;
     if (status != null) out['status'] = status;
     if (tipeKegiatan != null) out['tipe_kegiatan'] = tipeKegiatan;
 
     if (jadwalKegiatanUsers != null) {
-      final ids = jadwalKegiatanUsers!.map((e) => e['id']).where((id) => id != null).toList();
+      final ids = jadwalKegiatanUsers!
+          .map((e) => e['id'])
+          .where((id) => id != null)
+          .toList();
       if (ids.isNotEmpty) out['jadwal_kegiatan_user_ids'] = ids;
     }
 
     if (jadwalKegiatanAsrama != null) {
-      final ids = jadwalKegiatanAsrama!.map((e) => e['id']).where((id) => id != null).toList();
+      final ids = jadwalKegiatanAsrama!
+          .map((e) => e['id'])
+          .where((id) => id != null)
+          .toList();
       if (ids.isNotEmpty) out['jadwal_kegiatan_asrama_ids'] = ids;
     }
 
@@ -106,4 +133,3 @@ class JadwalKegiatan {
   // helper copied inline to avoid unused import issues
   dynamic categoriaOrNull(String? v) => v;
 }
-

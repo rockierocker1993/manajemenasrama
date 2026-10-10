@@ -39,4 +39,3 @@ class PasswordValidator {
 
   static bool isValid(String? value) => validate(value) == null;
 }
-

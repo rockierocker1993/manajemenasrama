@@ -11,9 +11,5 @@ class Asrama {
     );
   }
 
-  Map<String, dynamic> toJson() => {
-        'id': id,
-        'nama': nama,
-      };
+  Map<String, dynamic> toJson() => {'id': id, 'nama': nama};
 }
-

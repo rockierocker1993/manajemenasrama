@@ -13,7 +13,10 @@ import '../shared/models/base_response.dart';
 ///   message derived from the thrown exception and returns null.
 ///
 /// Success UI (toasts/dialogs) should be handled by the caller manually.
-Future<T?> runApiCall<T>(Future<T> Function() action, BuildContext context) async {
+Future<T?> runApiCall<T>(
+  Future<T> Function() action,
+  BuildContext context,
+) async {
   try {
     final res = await action();
 
@@ -24,7 +27,8 @@ Future<T?> runApiCall<T>(Future<T> Function() action, BuildContext context) asyn
         final title = res.titleEn ?? res.titleId ?? 'Gagal';
         final message = res.message ?? res.messageId ?? res.messageEn ?? '';
         final nav = Navigator.of(context);
-        if (nav.mounted) await _showErrorDialog(nav.context, '$title\n\n$message');
+        if (nav.mounted)
+          await _showErrorDialog(nav.context, '$title\n\n$message');
         return null;
       }
     }
@@ -55,11 +59,20 @@ Future<T?> runApiCall<T>(Future<T> Function() action, BuildContext context) asyn
           }
         }
         if (decoded is Map<String, dynamic>) {
-          final title = (decoded['title_en'] ?? decoded['title_id'])?.toString();
-          final message = (decoded['message'] ?? decoded['message_id'] ?? decoded['message_en'])?.toString();
+          final title = (decoded['title_en'] ?? decoded['title_id'])
+              ?.toString();
+          final message =
+              (decoded['message'] ??
+                      decoded['message_id'] ??
+                      decoded['message_en'])
+                  ?.toString();
           if (title != null || message != null) {
             final nav = Navigator.of(context);
-            if (nav.mounted) await _showErrorDialog(nav.context, '${title ?? 'Gagal'}\n\n${message ?? ''}');
+            if (nav.mounted)
+              await _showErrorDialog(
+                nav.context,
+                '${title ?? 'Gagal'}\n\n${message ?? ''}',
+              );
             return null;
           }
         }
@@ -90,4 +103,3 @@ Future<void> _showErrorDialog(BuildContext context, String message) {
     ),
   );
 }
-
