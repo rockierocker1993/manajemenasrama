@@ -117,17 +117,7 @@ class _LoginPageState extends State<LoginPage> {
                             ),
                           ),
                         ),
-                        Align(
-                          alignment: Alignment.centerRight,
-                          child: TextButton(
-                            onPressed: () {},
-                            child: const Text(
-                              'Forgot Password?',
-                              style: TextStyle(color: Colors.white),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 10),
+                       const SizedBox(height: 10),
                         SizedBox(
                           width: double.infinity,
                           height: 55,
