@@ -4,7 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
 import 'package:manajemenasrama/services/auth_service.dart';
-import 'package:manajemenasrama/services/token_storage.dart';
+import 'package:manajemenasrama/services/session_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
@@ -39,7 +39,7 @@ void main() {
       );
     });
 
-    final auth = AuthService(httpClient: mock, tokenStorage: TokenStorage());
+    final auth = AuthService(httpClient: mock, tokenStorage: SessionStorage());
     final session = await auth.login(
       username: 'ikhsanfadly',
       password: 'password12345',
@@ -48,7 +48,7 @@ void main() {
     expect(captured.method, 'POST');
     expect(session.accessToken, 'abc.def.ghi');
     expect(session.scope, 'SUPER_ADMIN');
-    expect(await TokenStorage().read(), isNotNull);
+    expect(await SessionStorage().read(), isNotNull);
     expect(auth.isLoggedIn, isTrue);
   });
 

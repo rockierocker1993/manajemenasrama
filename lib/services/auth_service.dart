@@ -3,8 +3,8 @@
 import 'package:http/http.dart' as http;
 
 import '../core/backend/backend_api_client.dart';
-import '../shared/models/backend_session.dart';
-import 'token_storage.dart';
+import '../shared/models/token.dart';
+import 'session_storage.dart';
 
 class AppAuthException implements Exception {
   AppAuthException(this.message);
@@ -16,22 +16,22 @@ class AppAuthException implements Exception {
 class AuthService {
   AuthService({
     BackendApiClient? apiClient,
-    TokenStorage? tokenStorage,
+    SessionStorage? tokenStorage,
     http.Client? httpClient,
   })  : _api = apiClient ?? BackendApiClient(httpClient: httpClient),
-        _storage = tokenStorage ?? TokenStorage();
+        _storage = tokenStorage ?? SessionStorage();
 
   final BackendApiClient _api;
-  final TokenStorage _storage;
+  final SessionStorage _storage;
 
-  final StreamController<BackendSession?> _controller =
-      StreamController<BackendSession?>.broadcast();
+  final StreamController<Token?> _controller =
+      StreamController<Token?>.broadcast();
 
-  BackendSession? _session;
+  Token? _session;
 
-  Stream<BackendSession?> get onSessionChanged => _controller.stream;
+  Stream<Token?> get onSessionChanged => _controller.stream;
 
-  BackendSession? get currentSession => _session;
+  Token? get currentSession => _session;
 
   bool get isLoggedIn => _session != null && !_session!.isExpired;
 
@@ -44,7 +44,7 @@ class AuthService {
     _controller.add(_session);
   }
 
-  Future<BackendSession> login({
+  Future<Token> login({
     required String username,
     required String password,
   }) async {
@@ -62,7 +62,7 @@ class AuthService {
         throw AppAuthException('Format response login tidak valid');
       }
 
-      final session = BackendSession.fromLoginResponse(
+      final session = Token.fromLoginResponse(
         username: username.trim(),
         json: response,
       );
@@ -116,12 +116,12 @@ class AuthService {
     _controller.add(null);
   }
 
-  int? sessionTtlSeconds(BackendSession? session) {
+  int? sessionTtlSeconds(Token? session) {
     if (session == null) return null;
     return session.expiresAt.difference(DateTime.now()).inSeconds;
   }
 
-  bool isSessionExpired(BackendSession? session) {
+  bool isSessionExpired(Token? session) {
     final ttl = sessionTtlSeconds(session);
     return ttl != null && ttl <= 0;
   }

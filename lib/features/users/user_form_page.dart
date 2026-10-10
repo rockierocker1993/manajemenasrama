@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../core/backend/backend_api_client.dart';
 import '../../core/validators/password_validator.dart';
-import '../../shared/models/app_user.dart';
+import '../../shared/models/profile.dart';
 import '../../shared/models/user_role.dart';
 import '../../services/user_service.dart';
 import '../../services/auth_service.dart';
@@ -11,14 +11,10 @@ import '../../services/auth_service.dart';
 ///
 /// Returns `true` via `Navigator.pop` when the list should refresh.
 class UserFormPage extends StatefulWidget {
-  const UserFormPage({
-    super.key,
-    required this.service,
-    this.existing,
-  });
+  const UserFormPage({super.key, required this.service, this.existing});
 
   final UserService service;
-  final AppUser? existing;
+  final Profile? existing;
 
   bool get isEdit => existing != null;
 
@@ -28,12 +24,16 @@ class UserFormPage extends StatefulWidget {
 
 class _UserFormPageState extends State<UserFormPage> {
   final _formKey = GlobalKey<FormState>();
-  late final TextEditingController _username =
-      TextEditingController(text: widget.existing?.username ?? '');
-  late final TextEditingController _fullName =
-      TextEditingController(text: widget.existing?.fullName ?? '');
+  late final TextEditingController _username = TextEditingController(
+    text: widget.existing?.username ?? '',
+  );
+  late final TextEditingController _fullName = TextEditingController(
+    text: widget.existing?.fullName ?? '',
+  );
   final TextEditingController _password = TextEditingController();
-  late UserRole _role = widget.existing?.role ?? UserRole.superAdmin;
+  // Default new users to 'pengurus' (allowed create options). If editing,
+  // preserve the existing role.
+  late UserRole _role = widget.existing?.role ?? UserRole.pengurus;
 
   bool _obscure = true;
   bool _saving = false;
@@ -81,17 +81,30 @@ class _UserFormPageState extends State<UserFormPage> {
           role: _role,
           password: _password.text.isEmpty ? null : _password.text,
         );
-      } else {
-        await widget.service.create(
-          username: _username.text,
-          fullName: _fullName.text,
-          password: _password.text,
-          role: _role,
-        );
-      }
+        } else {
+          final success = await widget.service.create(
+            username: _username.text,
+            fullName: _fullName.text,
+            password: _password.text,
+            role: _role,
+          );
+          if (!success) {
+            // If create returned false for some reason (should normally
+            // throw on error), don't close the form or trigger reload.
+            if (!mounted) return;
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Pembuatan pengguna gagal')),
+            );
+            return;
+          }
+        }
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(widget.isEdit ? 'Perubahan disimpan' : 'Pengguna dibuat')),
+        SnackBar(
+          content: Text(
+            widget.isEdit ? 'Perubahan disimpan' : 'Pengguna dibuat',
+          ),
+        ),
       );
       Navigator.of(context).pop(true);
     } on BackendApiException catch (e) {
@@ -105,16 +118,17 @@ class _UserFormPageState extends State<UserFormPage> {
     } on AppAuthException catch (e) {
       final msg = e.message.toLowerCase();
       final friendly =
-          msg.contains('already') || msg.contains('registered') || msg.contains('exists')
-              ? 'Username sudah digunakan'
-              : e.message;
+          msg.contains('already') ||
+              msg.contains('registered') ||
+              msg.contains('exists')
+          ? 'Username sudah digunakan'
+          : e.message;
       if (!mounted) return;
       ScaffoldMessenger.of(context)
           .showSnackBar(SnackBar(content: Text(friendly)));
     } on StateError catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text('$e')));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('$e')));
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context)
@@ -126,6 +140,12 @@ class _UserFormPageState extends State<UserFormPage> {
 
   @override
   Widget build(BuildContext context) {
+    // If editing an existing Super Admin, the dropdown should be disabled
+    // and only show the Super Admin value. For non-super-admin (or when
+    // creating a new user) only allow Pengurus and Ustadzah choices.
+    final bool isSuperAdminExisting =
+        widget.isEdit && widget.existing?.role == UserRole.superAdmin;
+
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.isEdit ? 'Edit Pengguna' : 'Tambah Pengguna'),
@@ -166,13 +186,13 @@ class _UserFormPageState extends State<UserFormPage> {
                   labelText: widget.isEdit
                       ? 'Password (kosongkan jika tidak diubah)'
                       : 'Password',
-                  helperText:
-                      'Min. 8 karakter, kombinasi huruf besar, kecil, angka & simbol',
+                  helperText: 'Min. 8 karakter, kombinasi huruf besar, kecil, angka & simbol',
                   helperMaxLines: 2,
                   prefixIcon: const Icon(Icons.lock_outline),
                   suffixIcon: IconButton(
                     icon: Icon(
-                        _obscure ? Icons.visibility_off : Icons.visibility),
+                      _obscure ? Icons.visibility_off : Icons.visibility,
+                    ),
                     onPressed: () => setState(() => _obscure = !_obscure),
                   ),
                   border: const OutlineInputBorder(),
@@ -187,11 +207,16 @@ class _UserFormPageState extends State<UserFormPage> {
                   prefixIcon: Icon(Icons.verified_user_outlined),
                   border: OutlineInputBorder(),
                 ),
-                items: UserRole.values
-                    .map((r) =>
-                        DropdownMenuItem(value: r, child: Text(r.label)))
+                // If editing a Super Admin, only show that value and disable
+                // changes. Otherwise, only show Pengurus and Ustadzah.
+                items: (isSuperAdminExisting
+                        ? [UserRole.superAdmin]
+                        : [UserRole.pengurus, UserRole.ustadzah])
+                    .map((r) => DropdownMenuItem(value: r, child: Text(r.label)))
                     .toList(),
-                onChanged: (v) => setState(() => _role = v ?? _role),
+                onChanged: isSuperAdminExisting
+                    ? null
+                    : (v) => setState(() => _role = v ?? _role),
               ),
               const SizedBox(height: 28),
               SizedBox(
@@ -203,10 +228,14 @@ class _UserFormPageState extends State<UserFormPage> {
                           width: 20,
                           height: 20,
                           child: CircularProgressIndicator(
-                              strokeWidth: 2, color: Colors.white),
+                            strokeWidth: 2,
+                            color: Colors.white,
+                          ),
                         )
                       : const Icon(Icons.save),
-                  label: Text(widget.isEdit ? 'Simpan Perubahan' : 'Buat Pengguna'),
+                  label: Text(
+                    widget.isEdit ? 'Simpan Perubahan' : 'Buat Pengguna',
+                  ),
                 ),
               ),
             ],

@@ -1,5 +1,5 @@
-class BackendSession {
-  BackendSession({
+class Token {
+  Token({
     required this.username,
     required this.accessToken,
     required this.tokenType,
@@ -17,7 +17,7 @@ class BackendSession {
 
   bool get isExpired => DateTime.now().isAfter(expiresAt);
 
-  factory BackendSession.fromLoginResponse({
+  factory Token.fromLoginResponse({
     required String username,
     required Map<String, dynamic> json,
   }) {
@@ -25,7 +25,7 @@ class BackendSession {
         ? json['data'] as Map<String, dynamic>
         : json;
     final expiresIn = (data['expires_in'] as num?)?.toInt() ?? 0;
-    return BackendSession(
+    return Token(
       username: username,
       accessToken: (data['access_token'] ?? '').toString(),
       tokenType: (data['token_type'] ?? 'Bearer').toString(),
@@ -44,7 +44,7 @@ class BackendSession {
         'expires_at': expiresAt.millisecondsSinceEpoch,
       };
 
-  factory BackendSession.fromJson(Map<String, dynamic> json) => BackendSession(
+  factory Token.fromJson(Map<String, dynamic> json) => Token(
         username: (json['username'] ?? '').toString(),
         accessToken: (json['access_token'] ?? '').toString(),
         tokenType: (json['token_type'] ?? 'Bearer').toString(),

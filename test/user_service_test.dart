@@ -53,20 +53,27 @@ void main() {
       expect(body['password'], 'chelRE@1da');
       expect(body['role'], 'SUPER_ADMIN');
       return http.Response(
-        jsonEncode({'response_code': 'RC000', 'status': false, 'data': null}),
+        jsonEncode({'response_code': 'RC000', 'status': true, 'data': {}}),
         200,
         headers: {'content-type': 'application/json'},
       );
     });
 
     final auth = AuthService(httpClient: mock);
-    final service = UserService(authService: auth);
-    await service.create(
+    final service = UserService(
+      authService: auth,
+      apiClient: BackendApiClient(
+        httpClient: mock,
+        bearerTokenProvider: () async => 'token-123',
+      ),
+    );
+    final ok = await service.create(
       username: 'budi',
       fullName: 'Budi S',
       password: 'chelRE@1da',
       role: UserRole.superAdmin,
     );
+    expect(ok, isTrue);
   });
 
   test('update sends bearer token and payload', () async {

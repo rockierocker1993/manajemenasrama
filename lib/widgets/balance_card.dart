@@ -30,7 +30,7 @@ class BalanceCard extends StatelessWidget {
         children: [
 
           Text(
-            "Available Balance",
+            "Jadwal Kegiatan Akan Datang",
             style: TextStyle(
               color: Colors.white70,
             ),

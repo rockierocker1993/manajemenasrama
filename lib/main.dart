@@ -6,7 +6,7 @@ import 'core/backend/backend_config.dart';
 import 'core/theme/app_theme.dart';
 import 'features/auth/login_page.dart';
 import 'features/dashboard/dashboard_page.dart';
-import 'shared/models/backend_session.dart';
+import 'shared/models/token.dart';
 import 'services/auth_service.dart';
 import 'services/user_service.dart';
 
@@ -33,9 +33,9 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  StreamSubscription<BackendSession?>? _sub;
+  StreamSubscription<Token?>? _sub;
   Timer? _expiryTimer;
-  BackendSession? _session;
+  Token? _session;
 
   late final UserService _userService;
 
@@ -59,7 +59,7 @@ class _MyAppState extends State<MyApp> {
     super.dispose();
   }
 
-  void _scheduleExpiry(BackendSession? session) {
+  void _scheduleExpiry(Token? session) {
     _expiryTimer?.cancel();
     final ttl = widget.authService.sessionTtlSeconds(session);
     if (ttl == null) return;

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:manajemenasrama/shared/models/profile.dart';
 import 'package:manajemenasrama/widgets/activity_item.dart';
 import 'package:manajemenasrama/widgets/balance_card.dart';
 import 'package:manajemenasrama/widgets/quick_action.dart';
@@ -24,14 +25,28 @@ class DashboardPage extends StatefulWidget {
 }
 
 class _DashboardPageState extends State<DashboardPage> {
+  late final _userService = widget.userService;
+  late final _authService = widget.authService;
+
   int currentIndex = 0;
+  late Future<Profile> _futureProfile;
+
+  @override
+  void initState() {
+    super.initState();
+    _futureProfile = _userService.me();
+  }
 
   Future<void> _logout() async {
     await widget.authService.logout();
     if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Anda telah logout')),
-    );
+    ScaffoldMessenger.of(context)
+        .showSnackBar(const SnackBar(content: Text('Anda telah logout')));
+  }
+
+  Future<void> _reload() async {
+    setState(() => _futureProfile = widget.userService.me());
+    await _futureProfile;
   }
 
   @override
@@ -52,7 +67,7 @@ class _DashboardPageState extends State<DashboardPage> {
           NavigationDestination(
             icon: Icon(Icons.receipt_long_outlined),
             selectedIcon: Icon(Icons.receipt_long),
-            label: 'Aktivitas Hari Ini',
+            label: 'Kegiatan Saya',
           ),
           NavigationDestination(
             icon: Icon(Icons.person_outline),
@@ -80,32 +95,47 @@ class _DashboardPageState extends State<DashboardPage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         const Text(
-                          'Good Morning',
+                          'Selamat Datang',
                           style: TextStyle(color: Colors.grey),
                         ),
                         SizedBox(height: 2),
-                        Text(
-                          widget.authService.currentSession?.username ?? 'User',
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        )
+                        FutureBuilder<Profile>(
+                          future: _futureProfile,
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
+                              return const Text(
+                                'Loading...',
+                                style: TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              );
+                            }
+
+                            if (snapshot.hasError) {
+                              return const Text(
+                                'User',
+                                style: TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              );
+                            }
+
+                            final profile = snapshot.data;
+
+                            return Text(
+                              profile?.fullName ?? 'User',
+                              style: const TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            );
+                          },
+                        ),
                       ],
                     ),
-                  ),
-                  IconButton(
-                    onPressed: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (_) => UsersPage(
-                            userService: widget.userService,
-                          ),
-                        ),
-                      );
-                    },
-                    icon: const Icon(Icons.manage_accounts_outlined),
-                    tooltip: 'Manajemen Pengguna',
                   ),
                   IconButton(
                     onPressed: _logout,
@@ -114,66 +144,39 @@ class _DashboardPageState extends State<DashboardPage> {
                   ),
                 ],
               ),
-              const SizedBox(height: 20),
-              TextField(
-                decoration: InputDecoration(
-                  hintText: 'Search',
-                  prefixIcon: const Icon(Icons.search),
-                  filled: true,
-                  fillColor: Colors.white,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(16),
-                    borderSide: BorderSide.none,
-                  ),
-                ),
-              ),
               const SizedBox(height: 24),
               const BalanceCard(),
               const SizedBox(height: 28),
               const Text(
-                "Quick Actions",
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
+                "Menu",
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 18),
-              const Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
-                  QuickAction(icon: Icons.send, label: "Transfer"),
-                  QuickAction(icon: Icons.account_balance_wallet, label: "Top Up"),
-                  QuickAction(icon: Icons.payment, label: "Pay"),
-                  QuickAction(icon: Icons.qr_code_scanner, label: "QR"),
-                ],
-              ),
-              const SizedBox(height: 30),
-              const Text(
-                "Overview",
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 18),
-              const Row(
-                children: [
-                  Expanded(
-                    child: StatCard(
-                      title: "Income",
-                      amount: "Rp12.5M",
-                      icon: Icons.arrow_downward,
-                      color: Colors.green,
-                    ),
+                  QuickAction(
+                    icon: Icons.manage_accounts_outlined,
+                    label: "Pengguna",
+                    onTap: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) =>
+                              UsersPage(userService: widget.userService),
+                        ),
+                      );
+                    },
                   ),
-                  SizedBox(width: 12),
-                  Expanded(
-                    child: StatCard(
-                      title: "Expense",
-                      amount: "Rp5.2M",
-                      icon: Icons.arrow_upward,
-                      color: Colors.red,
-                    ),
+                  QuickAction(icon: Icons.home_outlined, label: "Asrama"),
+                  QuickAction(
+                    icon: Icons.task_alt_sharp,
+                    label: "Ijin & Sakit",
+                    notificationCount: 10,
+                  ),
+                  QuickAction(
+                    icon: Icons.receipt_long_outlined,
+                    label: "Kegiatan",
+                    notificationCount: 10,
                   ),
                 ],
               ),
@@ -182,16 +185,10 @@ class _DashboardPageState extends State<DashboardPage> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   const Text(
-                    "Recent Activity",
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    "Hari Ini",
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   ),
-                  TextButton(
-                    onPressed: () {},
-                    child: const Text("See All"),
-                  )
+                  TextButton(onPressed: () {}, child: const Text("See All")),
                 ],
               ),
               const SizedBox(height: 10),

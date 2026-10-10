@@ -1,8 +1,8 @@
 import 'user_role.dart';
 
 /// Application user record mapped from `public.app_user` rows.
-class AppUser {
-  AppUser({
+class Profile {
+  Profile({
     required this.id,
     required this.username,
     required this.fullName,
@@ -14,7 +14,7 @@ class AppUser {
   final String fullName;
   final UserRole role;
 
-  factory AppUser.fromJson(Map<String, dynamic> json) => AppUser(
+  factory Profile.fromJson(Map<String, dynamic> json) => Profile(
         id: (json['id'] ?? '').toString(),
         username: (json['username'] ?? '') as String,
         fullName: (json['full_name'] ?? json['fullName'] ?? '') as String,
@@ -28,13 +28,13 @@ class AppUser {
         'role': role.wireValue,
       };
 
-  AppUser copyWith({
+  Profile copyWith({
     String? id,
     String? username,
     String? fullName,
     UserRole? role,
   }) =>
-      AppUser(
+      Profile(
         id: id ?? this.id,
         username: username ?? this.username,
         fullName: fullName ?? this.fullName,

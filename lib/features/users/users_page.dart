@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../core/constants/app_colors.dart';
-import '../../shared/models/app_user.dart';
+import '../../shared/models/profile.dart';
 import '../../shared/models/user_role.dart';
 import '../../services/user_service.dart';
 import 'user_form_page.dart';
@@ -18,7 +18,7 @@ class UsersPage extends StatefulWidget {
 
 class _UsersPageState extends State<UsersPage> {
   late final UserService _service = widget.userService;
-  late Future<List<AppUser>> _future;
+  late Future<List<Profile>> _future;
 
   @override
   void initState() {
@@ -31,7 +31,7 @@ class _UsersPageState extends State<UsersPage> {
     await _future;
   }
 
-  Future<void> _openForm({AppUser? existing}) async {
+  Future<void> _openForm({Profile? existing}) async {
     final changed = await Navigator.of(context).push<bool>(
       MaterialPageRoute(
         builder: (_) => UserFormPage(service: _service, existing: existing),
@@ -40,7 +40,7 @@ class _UsersPageState extends State<UsersPage> {
     if (changed == true) _reload();
   }
 
-  Future<void> _confirmDelete(AppUser user) async {
+  Future<void> _confirmDelete(Profile user) async {
     final ok = await showDialog<bool>(
       context: context,
       builder: (_) => AlertDialog(
@@ -60,7 +60,7 @@ class _UsersPageState extends State<UsersPage> {
     );
     if (ok != true) return;
     try {
-      await _service.delete(user.id);
+      await _service.delete(user.username);
       if (!mounted) return;
       ScaffoldMessenger.of(context)
           .showSnackBar(const SnackBar(content: Text('Pengguna dihapus')));
@@ -87,7 +87,7 @@ class _UsersPageState extends State<UsersPage> {
       ),
       body: RefreshIndicator(
         onRefresh: _reload,
-        child: FutureBuilder<List<AppUser>>(
+        child: FutureBuilder<List<Profile>>(
           future: _future,
           builder: (context, snap) {
             if (snap.connectionState == ConnectionState.waiting) {
@@ -109,7 +109,7 @@ class _UsersPageState extends State<UsersPage> {
                 ],
               );
             }
-            final users = snap.data ?? const <AppUser>[];
+            final users = snap.data ?? const <Profile>[];
             if (users.isEmpty) {
               return ListView(
                 children: const [
