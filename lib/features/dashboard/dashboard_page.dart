@@ -8,7 +8,9 @@ import 'package:manajemenasrama/widgets/stat_card.dart';
 import '../../core/constants/app_colors.dart';
 import '../../services/auth_service.dart';
 import '../../services/user_service.dart';
+import '../../services/asrama_service.dart';
 import '../users/users_page.dart';
+import '../asrama/asrama_page.dart';
 
 class DashboardPage extends StatefulWidget {
   const DashboardPage({
@@ -167,7 +169,19 @@ class _DashboardPageState extends State<DashboardPage> {
                       );
                     },
                   ),
-                  QuickAction(icon: Icons.home_outlined, label: "Asrama"),
+                  QuickAction(
+                    icon: Icons.home_outlined,
+                    label: "Asrama",
+                    onTap: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => AsramaPage(
+                            service: AsramaService(authService: widget.authService),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
                   QuickAction(
                     icon: Icons.task_alt_sharp,
                     label: "Ijin & Sakit",

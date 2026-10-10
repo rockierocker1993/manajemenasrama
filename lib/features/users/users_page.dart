@@ -28,15 +28,10 @@ class _UsersPageState extends State<UsersPage> {
 
   Future<void> _reload() async {
     final future = _service.list();
-
     setState(() {
       _future = future;
     });
-
-    final users = await future;
-
-    debugPrint('Jumlah users: ${users.length}');
-    debugPrint('Users: $users');
+    await future;
   }
 
   Future<void> _openForm({Profile? existing}) async {

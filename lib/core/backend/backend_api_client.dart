@@ -91,7 +91,7 @@ class BackendApiClient {
 
   String? _extractMessage(dynamic body) {
     if (body is Map) {
-      return (body['message_en'] ?? body['message_id'] ?? body['message'] ?? body['error'])
+      return (body['message_id'] ?? body['message_en'] ?? body['message'] ?? body['error'])
           ?.toString();
     }
     return null;
