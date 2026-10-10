@@ -67,13 +67,13 @@ void main() {
         bearerTokenProvider: () async => 'token-123',
       ),
     );
-    final ok = await service.create(
+    final br = await service.create(
       username: 'budi',
       fullName: 'Budi S',
       password: 'chelRE@1da',
       role: UserRole.superAdmin,
     );
-    expect(ok, isTrue);
+    expect(br.isSuccess, isTrue);
   });
 
   test('update sends bearer token and payload', () async {
@@ -97,12 +97,13 @@ void main() {
       ),
     );
 
-    await service.update(
+    final br = await service.update(
       id: '7',
       username: 'ana',
       fullName: 'Ana',
       role: UserRole.pengurus,
     );
+    expect(br.data, isNull);
   });
 
   test('delete returns normally on 204', () async {

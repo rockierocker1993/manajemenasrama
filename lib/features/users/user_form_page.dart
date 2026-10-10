@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 
-import '../../core/backend/backend_api_client.dart';
 import '../../core/validators/password_validator.dart';
 import '../../shared/models/profile.dart';
 import '../../shared/models/user_role.dart';
+import '../../shared/models/base_response.dart';
 import '../../services/user_service.dart';
-import '../../services/auth_service.dart';
+import '../../core/api_error_handler.dart';
 
 /// Create / edit a user.
 ///
@@ -72,70 +72,48 @@ class _UserFormPageState extends State<UserFormPage> {
   Future<void> _save() async {
     if (!(_formKey.currentState?.validate() ?? false)) return;
     setState(() => _saving = true);
-    try {
+    // Use the generic API runner which shows a popup on error. Success
+    // notifications are handled manually below (no popup on success).
+    final result = await runApiCall(() async {
       if (widget.isEdit) {
-        await widget.service.update(
+        return await widget.service.update(
           id: widget.existing!.id,
           username: _username.text,
           fullName: _fullName.text,
           role: _role,
           password: _password.text.isEmpty ? null : _password.text,
         );
-        } else {
-          final success = await widget.service.create(
-            username: _username.text,
-            fullName: _fullName.text,
-            password: _password.text,
-            role: _role,
-          );
-          if (!success) {
-            // If create returned false for some reason (should normally
-            // throw on error), don't close the form or trigger reload.
-            if (!mounted) return;
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Pembuatan pengguna gagal')),
-            );
-            return;
-          }
-        }
-      if (!mounted) return;
+      }
+      return await widget.service.create(
+        username: _username.text,
+        fullName: _fullName.text,
+        password: _password.text,
+        role: _role,
+      );
+    }, context);
+
+    if (!mounted) return;
+    if (result == null) {
+      // Error already shown by runApiCall. Just stop saving state.
+      setState(() => _saving = false);
+      return;
+    }
+
+    // On success, show message from backend when present, otherwise default.
+    final br = result as BaseResponse<dynamic>;
+    final msg = br.message ?? br.titleEn ?? br.titleId;
+    if (msg != null && msg.isNotEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
+    } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(
-            widget.isEdit ? 'Perubahan disimpan' : 'Pengguna dibuat',
-          ),
+          content: Text(widget.isEdit ? 'Perubahan disimpan' : 'Pengguna dibuat'),
         ),
       );
-      Navigator.of(context).pop(true);
-    } on BackendApiException catch (e) {
-      final msg = e.message.toLowerCase();
-      final friendly = msg.contains('duplicate') || msg.contains('unique')
-          ? 'Username sudah digunakan'
-          : e.message;
-      if (!mounted) return;
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text(friendly)));
-    } on AppAuthException catch (e) {
-      final msg = e.message.toLowerCase();
-      final friendly =
-          msg.contains('already') ||
-              msg.contains('registered') ||
-              msg.contains('exists')
-          ? 'Username sudah digunakan'
-          : e.message;
-      if (!mounted) return;
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text(friendly)));
-    } on StateError catch (e) {
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('$e')));
-    } catch (e) {
-      if (!mounted) return;
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text('Gagal menyimpan: $e')));
-    } finally {
-      if (mounted) setState(() => _saving = false);
     }
+
+    setState(() => _saving = false);
+    Navigator.of(context).pop(true);
   }
 
   @override

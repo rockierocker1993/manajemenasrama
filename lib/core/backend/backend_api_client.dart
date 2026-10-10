@@ -63,9 +63,9 @@ class BackendApiClient {
     return _decode(res);
   }
 
-  Future<void> delete(String path) async {
+  Future<dynamic> delete(String path) async {
     final res = await _http.delete(_uri(path), headers: await _headers());
-    _decode(res);
+    return _decode(res);
   }
 
   dynamic _decode(http.Response res) {

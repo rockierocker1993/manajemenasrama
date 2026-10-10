@@ -24,7 +24,7 @@ void main() {
       return http.Response(
         jsonEncode({
           'response_code': 'RC000',
-          'status': false,
+          'status': true,
           'message_id': 'Sukses',
           'message_en': 'Success',
           'data': {
@@ -52,36 +52,6 @@ void main() {
     expect(auth.isLoggedIn, isTrue);
   });
 
-  test('register posts payload and succeeds', () async {
-    final mock = MockClient((req) async {
-      expect(req.method, 'POST');
-      expect(req.url.path, '/api/auth/register');
-      final body = jsonDecode(req.body) as Map<String, dynamic>;
-      expect(body['username'], 'ikhsanfadly');
-      expect(body['password'], 'password12345');
-      expect(body['full_name'], 'ikhsan fadly');
-      expect(body['role'], 'SUPER_ADMIN');
-      return http.Response(
-        jsonEncode({
-          'response_code': 'RC000',
-          'status': false,
-          'message_id': 'Sukses',
-          'message_en': 'Success',
-          'data': null,
-        }),
-        200,
-        headers: {'content-type': 'application/json'},
-      );
-    });
-
-    final auth = AuthService(httpClient: mock);
-    await auth.register(
-      username: 'ikhsanfadly',
-      password: 'password12345',
-      fullName: 'ikhsan fadly',
-      role: 'SUPER_ADMIN',
-    );
-  });
 
   test('login throws on bad credentials', () async {
     final mock = MockClient((_) async => http.Response(

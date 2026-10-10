@@ -1,5 +1,6 @@
 ﻿import '../core/backend/backend_api_client.dart';
 import '../shared/models/profile.dart';
+import '../shared/models/base_response.dart';
 import '../shared/models/user_role.dart';
 import 'auth_service.dart';
 
@@ -21,26 +22,38 @@ class UserService {
   late final BackendApiClient _api;
 
   Future<List<Profile>> list() async {
-    final data = await _api.getJson('/api/users');
-    final items = (data is Map<String, dynamic> && data['data'] is List)
-        ? data['data'] as List
-        : (data as List? ?? const []);
-    return items
+    final raw = await _api.getJson('/api/users');
+
+    // Support both wrapped responses ({ data: [...] }) and raw arrays.
+    List itemsRaw;
+    if (raw is Map<String, dynamic>) {
+      final br = BaseResponse<List<dynamic>>.fromJson(raw, (d) => (d as List).cast());
+      itemsRaw = br.data ?? <dynamic>[];
+      if (br.status == false) {
+        throw Exception(br.message ?? 'Gagal memuat pengguna');
+      }
+    } else {
+      itemsRaw = (raw as List? ?? <dynamic>[]);
+    }
+
+    return itemsRaw
         .cast<Map<String, dynamic>>()
         .map(Profile.fromJson)
         .toList(growable: false);
   }
 
   Future<Profile> me() async {
-    final data = await _api.getJson('/api/users/me');
-    final payload =
-        data is Map<String, dynamic> && data['data'] is Map<String, dynamic>
-        ? data['data'] as Map<String, dynamic>
-        : data as Map<String, dynamic>;
-    return Profile.fromJson(payload);
+    final raw = await _api.getJson('/api/users/me');
+    if (raw is Map<String, dynamic>) {
+      final br = BaseResponse<Map<String, dynamic>>.fromJson(raw, (d) => Map<String, dynamic>.from(d as Map));
+      if (br.status == false) throw Exception(br.message ?? 'Gagal memuat profil');
+      final payload = br.data ?? <String, dynamic>{};
+      return Profile.fromJson(payload);
+    }
+    return Profile.fromJson(Map<String, dynamic>.from(raw as Map));
   }
 
-  Future<bool> create({
+  Future<BaseResponse<dynamic>> create({
     required String username,
     required String fullName,
     required String password,
@@ -62,41 +75,42 @@ class UserService {
         'role': role.wireValue,
       });
 
-      // Some backends return a 200 with a payload containing a `status`
-      // boolean. Treat an explicit `status: false` as failure so callers
-      // (UI) don't assume success when the operation actually failed.
-      if (res is Map<String, dynamic>) {
-        // If backend explicitly marks status as false, treat as failure.
-        if (res.containsKey('status') && res['status'] == false) {
-          throw AppAuthException(
-              (res['message'] ?? 'Registrasi gagal').toString());
-        }
-
-        // Some backends return a 200 with data: null when operation failed.
-        if (res.containsKey('data') && res['data'] == null) {
-          throw AppAuthException((res['message'] ?? 'Registrasi gagal').toString());
-        }
+      final br = BaseResponse<dynamic>.fromJson(res, (d) => d);
+      if (!br.isSuccess) {
+        throw AppAuthException(br.message ?? 'Registrasi gagal');
       }
-      return true;
+      return br;
     } on BackendApiException catch (e) {
       throw AppAuthException(e.message);
     }
   }
 
-  Future<void> update({
+  Future<BaseResponse<dynamic>> update({
     required String id,
     required String username,
     required String fullName,
     required UserRole role,
     String? password,
   }) async {
-    await _api.putJson('/api/users/$id', {
+    final res = await _api.putJson('/api/users/$id', {
       'username': username.trim(),
       'full_name': fullName.trim(),
       'role': role.wireValue,
       if (password != null && password.isNotEmpty) 'password': password,
     });
+
+    final br = BaseResponse<dynamic>.fromJson(res, (d) => d);
+    if (br.status == false) {
+      throw Exception(br.message ?? 'Gagal memperbarui pengguna');
+    }
+    return br;
   }
 
-  Future<void> delete(String username) => _api.delete('/api/users/$username');
+  Future<BaseResponse<dynamic>?> delete(String username) async {
+    final res = await _api.delete('/api/users/$username');
+    if (res == null) return null;
+    final br = BaseResponse<dynamic>.fromJson(res, (d) => d);
+    if (br.status == false) throw Exception(br.message ?? 'Gagal menghapus pengguna');
+    return br;
+  }
 }

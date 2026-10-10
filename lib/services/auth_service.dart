@@ -1,9 +1,11 @@
 ﻿import 'dart:async';
 
+import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 
 import '../core/backend/backend_api_client.dart';
 import '../shared/models/token.dart';
+import '../shared/models/base_response.dart';
 import 'session_storage.dart';
 
 class AppAuthException implements Exception {
@@ -58,14 +60,17 @@ class AuthService {
         {'username': username.trim(), 'password': password},
       );
 
-      if (response is! Map<String, dynamic>) {
-        throw AppAuthException('Format response login tidak valid');
+      final br = BaseResponse<Map<String, dynamic>>.fromJson(
+        response,
+        (d) => Map<String, dynamic>.from(d as Map),
+      );
+
+      if (!br.isSuccess) {
+        throw AppAuthException(br.message ?? 'Login gagal');
       }
 
-      final session = Token.fromLoginResponse(
-        username: username.trim(),
-        json: response,
-      );
+      final sessionJson = br.data ?? {};
+      final session = Token.fromLoginResponse(username: username.trim(), json: {'data': sessionJson});
       if (session.accessToken.isEmpty) {
         throw AppAuthException('Token login tidak diterima');
       }
@@ -82,31 +87,6 @@ class AuthService {
       throw AppAuthException(e.message);
     } catch (e) {
       throw AppAuthException('Login gagal: $e');
-    }
-  }
-
-  Future<void> register({
-    required String username,
-    required String password,
-    required String fullName,
-    required String role,
-  }) async {
-    if (username.trim().isEmpty || password.isEmpty || fullName.trim().isEmpty) {
-      throw AppAuthException('Username, password, dan nama lengkap wajib diisi');
-    }
-
-    try {
-      await _api.postJson(
-        '/api/auth/register',
-        {
-          'username': username.trim(),
-          'password': password,
-          'full_name': fullName.trim(),
-          'role': role,
-        },
-      );
-    } on BackendApiException catch (e) {
-      throw AppAuthException(e.message);
     }
   }
 
