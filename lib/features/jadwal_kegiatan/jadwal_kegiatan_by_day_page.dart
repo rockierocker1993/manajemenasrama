@@ -86,8 +86,8 @@ class _JadwalKegiatanByDayPageState extends State<JadwalKegiatanByDayPage> {
                   children: [
                     Icon(
                       Icons.category_outlined,
-                      size: 14,
-                      color: Colors.black45,
+                      size: 16,
+                      color: AppColors.primary,
                     ),
                     const SizedBox(width: 6),
                     Text(_safe(item.kategori), style: metaStyle),
@@ -98,8 +98,8 @@ class _JadwalKegiatanByDayPageState extends State<JadwalKegiatanByDayPage> {
                   children: [
                     Icon(
                       Icons.access_time_rounded,
-                      size: 14,
-                      color: Colors.black45,
+                      size: 16,
+                      color: AppColors.primary,
                     ),
                     const SizedBox(width: 6),
                     Text('${_safe(item.jamAwal)} - ${_safe(item.jamAkhir)}', style: metaStyle),
@@ -113,8 +113,8 @@ class _JadwalKegiatanByDayPageState extends State<JadwalKegiatanByDayPage> {
                 children: [
                   Icon(
                     Icons.description_outlined,
-                    size: 14,
-                    color: Colors.black45,
+                    size: 16,
+                    color: AppColors.primary,
                   ),
                   const SizedBox(width: 8),
                   Expanded(child: Text(_safe(item.deskripsi), style: descStyle)),
@@ -124,7 +124,7 @@ class _JadwalKegiatanByDayPageState extends State<JadwalKegiatanByDayPage> {
             ],
             const SizedBox(height: 8),
             Row(children: [
-              const Icon(Icons.apartment_rounded, size: 14, color: Colors.black45),
+              const Icon(Icons.apartment_rounded, size: 16, color: AppColors.primary),
               const SizedBox(width: 8),
               Expanded(child: Text(_safe(item.jadwalKegiatanAsrama), style: metaStyle)),
             ]),
@@ -165,7 +165,21 @@ class _JadwalKegiatanByDayPageState extends State<JadwalKegiatanByDayPage> {
         else
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
-            child: Column(children: sorted.map(_buildItem).toList()),
+            child: Column(
+              children: [
+                for (var i = 0; i < sorted.length; i++) ...[
+                  _buildItem(sorted[i]),
+                  if (i < sorted.length - 1)
+                    Divider(
+                      height: 18,
+                      thickness: 1,
+                      color: Colors.grey.shade200,
+                      indent: 12,
+                      endIndent: 12,
+                    ),
+                ]
+              ],
+            ),
           ),
       ],
     );
