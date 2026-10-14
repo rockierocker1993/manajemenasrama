@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:manajemenasrama/shared/models/jadwal_kegiatan_list.dart';
 import 'package:manajemenasrama/shared/models/profile.dart';
-import 'package:manajemenasrama/widgets/activity_item.dart';
+// ...existing code... (removed unused import)
 import 'package:manajemenasrama/widgets/jadwal_kegiatan_card.dart';
 import 'package:manajemenasrama/widgets/quick_action.dart';
 // ...existing code... (removed unused import)
@@ -9,6 +9,7 @@ import 'package:manajemenasrama/widgets/quick_action.dart';
 import '../../core/constants/app_colors.dart';
 import '../../services/auth_service.dart';
 import '../../services/user_service.dart';
+import '../../shared/models/user_role.dart';
 import '../../services/asrama_service.dart';
 import '../users/users_page.dart';
 import '../asrama/asrama_page.dart';
@@ -184,57 +185,90 @@ class _DashboardPageState extends State<DashboardPage> {
                       style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 18),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: [
-                        QuickAction(
-                          icon: Icons.manage_accounts_outlined,
-                          label: "Pengguna",
-                          onTap: () {
-                            Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder: (_) =>
-                                    UsersPage(userService: widget.userService),
+                    FutureBuilder<Profile>(
+                      future: _futureProfile,
+                      builder: (context, snapRole) {
+                        // Role-based access mapping
+                        final allowed = <String, List<UserRole>>{
+                          'pengguna': [UserRole.superAdmin],
+                          'asrama': [UserRole.superAdmin, UserRole.pengurus],
+                          'ijin': [UserRole.ustadzah, UserRole.pengurus],
+                          'jadwal': [UserRole.superAdmin, UserRole.pengurus],
+                        };
+
+                        UserRole? role;
+                        if (snapRole.connectionState == ConnectionState.done && snapRole.hasData) {
+                          role = snapRole.data!.role;
+                        }
+
+                        bool can(String key) {
+                          if (role == null) return false; // hide until loaded
+                          return allowed[key]?.contains(role) == true;
+                        }
+
+                        Widget buildQuick({required IconData icon, required String label, VoidCallback? onTap}) {
+                          return QuickAction(icon: icon, label: label, onTap: onTap);
+                        }
+
+                        return Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          children: [
+                            // Pengguna
+                            if (can('pengguna'))
+                              buildQuick(
+                                icon: Icons.manage_accounts_outlined,
+                                label: 'Pengguna',
+                                onTap: () {
+                                  Navigator.of(context).push(
+                                    MaterialPageRoute(
+                                      builder: (_) => UsersPage(userService: widget.userService),
+                                    ),
+                                  );
+                                },
                               ),
-                            );
-                          },
-                        ),
-                        QuickAction(
-                          icon: Icons.home_outlined,
-                          label: "Asrama",
-                          onTap: () {
-                            Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder: (_) => AsramaPage(
-                                  service: AsramaService(
-                                    authService: widget.authService,
-                                  ),
-                                ),
+
+                            // Asrama
+                            if (can('asrama'))
+                              buildQuick(
+                                icon: Icons.home_outlined,
+                                label: 'Asrama',
+                                onTap: () {
+                                  Navigator.of(context).push(
+                                    MaterialPageRoute(
+                                      builder: (_) => AsramaPage(
+                                        service: AsramaService(authService: widget.authService),
+                                      ),
+                                    ),
+                                  );
+                                },
                               ),
-                            );
-                          },
-                        ),
-                        QuickAction(
-                          icon: Icons.task_alt_sharp,
-                          label: "Ijin & Sakit",
-                          notificationCount: 10,
-                        ),
-                        QuickAction(
-                          icon: Icons.receipt_long_outlined,
-                          label: "Jadwal Kegiatan",
-                          onTap: () {
-                            Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder: (_) => JadwalKegiatanPage(
-                                  service: JadwalKegiatanService(
-                                    authService: widget.authService,
-                                  ),
-                                ),
+
+                            // Ijin & Sakit
+                            if (can('ijin'))
+                              buildQuick(
+                                icon: Icons.task_alt_sharp,
+                                label: 'Ijin & Sakit',
+                                onTap: null,
                               ),
-                            );
-                          },
-                        ),
-                      ],
+
+                            // Jadwal Kegiatan
+                            if (can('jadwal'))
+                              buildQuick(
+                                icon: Icons.receipt_long_outlined,
+                                label: 'Jadwal Kegiatan',
+                                onTap: () {
+                                  Navigator.of(context).push(
+                                    MaterialPageRoute(
+                                      builder: (_) => JadwalKegiatanPage(
+                                        service: JadwalKegiatanService(authService: widget.authService),
+                                      ),
+                                    ),
+                                  );
+                                },
+                              ),
+                          ],
+                        );
+                      },
                     ),
                   ],
                 ),

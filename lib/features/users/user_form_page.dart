@@ -78,6 +78,7 @@ class _UserFormPageState extends State<UserFormPage> {
       if (widget.isEdit) {
         return await widget.service.update(
           id: widget.existing!.id,
+          currentUsername: widget.existing!.username,
           username: _username.text,
           fullName: _fullName.text,
           role: _role,

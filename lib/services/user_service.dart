@@ -94,12 +94,14 @@ class UserService {
 
   Future<BaseResponse<dynamic>> update({
     required String id,
+    required String currentUsername,
     required String username,
     required String fullName,
     required UserRole role,
     String? password,
   }) async {
-    final res = await _api.putJson('/api/users/$id', {
+    final res = await _api.putJson('/api/users', {
+      'current_username': currentUsername.trim(),
       'username': username.trim(),
       'full_name': fullName.trim(),
       'role': role.wireValue,

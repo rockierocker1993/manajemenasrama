@@ -82,6 +82,7 @@ void main() {
       expect(req.url.path, '/api/users/7');
       expect(req.headers['Authorization'], 'Bearer token-123');
       final body = jsonDecode(req.body) as Map<String, dynamic>;
+      expect(body['current_username'], 'ana');
       expect(body['username'], 'ana');
       expect(body['full_name'], 'Ana');
       expect(body['role'], 'PENGURUS');
@@ -99,6 +100,7 @@ void main() {
 
     final br = await service.update(
       id: '7',
+      currentUsername: 'ana',
       username: 'ana',
       fullName: 'Ana',
       role: UserRole.pengurus,
