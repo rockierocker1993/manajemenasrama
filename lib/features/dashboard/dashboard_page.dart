@@ -212,70 +212,82 @@ class _DashboardPageState extends State<DashboardPage> {
                           return QuickAction(icon: icon, label: label, onTap: onTap);
                         }
 
-                        return Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
-                          children: [
-                            // Pengguna
-                            if (can('pengguna'))
-                              buildQuick(
-                                icon: Icons.manage_accounts_outlined,
-                                label: 'Pengguna',
-                                onTap: () {
-                                  Navigator.of(context).push(
-                                    MaterialPageRoute(
-                                      builder: (_) => UsersPage(userService: widget.userService),
-                                    ),
-                                  );
-                                },
-                              ),
+                        // Layout quick actions left-to-right. Use horizontal scroll if overflow.
+                        return SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              if (can('pengguna'))
+                                Padding(
+                                  padding: const EdgeInsets.only(right: 12.0),
+                                  child: buildQuick(
+                                    icon: Icons.manage_accounts_outlined,
+                                    label: 'Pengguna',
+                                    onTap: () {
+                                      Navigator.of(context).push(
+                                        MaterialPageRoute(
+                                          builder: (_) => UsersPage(userService: widget.userService),
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                ),
 
-                            // Asrama
-                            if (can('asrama'))
-                              buildQuick(
-                                icon: Icons.home_outlined,
-                                label: 'Asrama',
-                                onTap: () {
-                                  Navigator.of(context).push(
-                                    MaterialPageRoute(
-                                      builder: (_) => AsramaPage(
-                                        service: AsramaService(authService: widget.authService),
-                                      ),
-                                    ),
-                                  );
-                                },
-                              ),
+                              if (can('asrama'))
+                                Padding(
+                                  padding: const EdgeInsets.only(right: 12.0),
+                                  child: buildQuick(
+                                    icon: Icons.home_outlined,
+                                    label: 'Asrama',
+                                    onTap: () {
+                                      Navigator.of(context).push(
+                                        MaterialPageRoute(
+                                          builder: (_) => AsramaPage(
+                                            service: AsramaService(authService: widget.authService),
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                ),
 
-                            // Ijin & Sakit
-                            if (can('ijin'))
-                              buildQuick(
-                                icon: Icons.task_alt_sharp,
-                                label: 'Ijin & Sakit',
-                                onTap: () {
-                                  Navigator.of(context).push(MaterialPageRoute(
-                                    builder: (_) => IjinPage(
-                                      service: IjinService(authService: widget.authService),
-                                      currentProfile: snapRole.data!,
-                                    ),
-                                  ));
-                                },
-                              ),
+                              if (can('ijin'))
+                                Padding(
+                                  padding: const EdgeInsets.only(right: 12.0),
+                                  child: buildQuick(
+                                    icon: Icons.task_alt_sharp,
+                                    label: 'Ijin & Sakit',
+                                    onTap: () {
+                                      Navigator.of(context).push(MaterialPageRoute(
+                                        builder: (_) => IjinPage(
+                                          service: IjinService(authService: widget.authService),
+                                          currentProfile: snapRole.data!,
+                                        ),
+                                      ));
+                                    },
+                                  ),
+                                ),
 
-                            // Jadwal Kegiatan
-                            if (can('jadwal'))
-                              buildQuick(
-                                icon: Icons.receipt_long_outlined,
-                                label: 'Jadwal Kegiatan',
-                                onTap: () {
-                                  Navigator.of(context).push(
-                                    MaterialPageRoute(
-                                      builder: (_) => JadwalKegiatanPage(
-                                        service: JadwalKegiatanService(authService: widget.authService),
-                                      ),
-                                    ),
-                                  );
-                                },
-                              ),
-                          ],
+                              if (can('jadwal'))
+                                Padding(
+                                  padding: const EdgeInsets.only(right: 12.0),
+                                  child: buildQuick(
+                                    icon: Icons.receipt_long_outlined,
+                                    label: 'Jadwal Kegiatan',
+                                    onTap: () {
+                                      Navigator.of(context).push(
+                                        MaterialPageRoute(
+                                          builder: (_) => JadwalKegiatanPage(
+                                            service: JadwalKegiatanService(authService: widget.authService),
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                ),
+                            ],
+                          ),
                         );
                       },
                     ),
