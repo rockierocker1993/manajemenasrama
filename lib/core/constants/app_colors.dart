@@ -10,4 +10,8 @@ class AppColors {
   static const textPrimary = Color(0xFF173329);
 
   static const white = Colors.white;
+  // Semantic status colors
+  static const success = Color(0xFF2E7D32);
+  static const danger = Color(0xFFB00020);
+  static const warning = Color(0xFFF57C00);
 }

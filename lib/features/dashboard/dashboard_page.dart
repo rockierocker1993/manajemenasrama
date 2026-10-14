@@ -15,6 +15,8 @@ import '../users/users_page.dart';
 import '../asrama/asrama_page.dart';
 import '../jadwal_kegiatan/jadwal_kegiatan_page.dart';
 import '../profile/update_profile_page.dart';
+import '../ijin/ijin_page.dart';
+import '../../services/ijin_service.dart';
 
 import 'package:manajemenasrama/features/jadwal_kegiatan/jadwal_kegiatan_by_day_page.dart'
     as byday_page;
@@ -248,7 +250,14 @@ class _DashboardPageState extends State<DashboardPage> {
                               buildQuick(
                                 icon: Icons.task_alt_sharp,
                                 label: 'Ijin & Sakit',
-                                onTap: null,
+                                onTap: () {
+                                  Navigator.of(context).push(MaterialPageRoute(
+                                    builder: (_) => IjinPage(
+                                      service: IjinService(authService: widget.authService),
+                                      currentProfile: snapRole.data!,
+                                    ),
+                                  ));
+                                },
                               ),
 
                             // Jadwal Kegiatan
