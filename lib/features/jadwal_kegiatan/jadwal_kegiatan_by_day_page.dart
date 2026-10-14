@@ -191,7 +191,7 @@ class _JadwalKegiatanByDayPageState extends State<JadwalKegiatanByDayPage> {
       appBar: AppBar(
         backgroundColor: AppColors.primary,
         foregroundColor: Colors.white,
-        title: const Text('Jadwal Kegiatan Saya'),
+        title: const Text('Jadwal Kegiatan'),
       ),
       body: RefreshIndicator(
         onRefresh: _reload,
