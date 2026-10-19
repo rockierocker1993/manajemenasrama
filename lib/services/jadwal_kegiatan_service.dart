@@ -166,4 +166,31 @@ class JadwalKegiatanService {
       'minggu': <dynamic>[],
     });
   }
+
+  /// Get schedules grouped by day for the current user.
+  /// Returns a [JadwalKegiatanByDay] which contains lists for each weekday.
+  Future<JadwalKegiatanByDay> asramaByDay(dynamic asramaId) async {
+    final raw = await _api.getJson('/api/jadwal-kegiatan/asrama/by-day/$asramaId');
+    if (raw is Map<String, dynamic>) {
+      final br = BaseResponse<Map<String, dynamic>>.fromJson(
+        raw,
+            (d) => Map<String, dynamic>.from(d as Map),
+      );
+      if (br.status == false)
+        throw Exception(br.message ?? 'Gagal memuat jadwal kegiatan per-hari');
+      final payload = br.data ?? <String, dynamic>{};
+      return JadwalKegiatanByDay.fromJson(payload);
+    }
+
+    // If API returned a non-map (unexpected), return empty structure
+    return JadwalKegiatanByDay.fromJson(<String, dynamic>{
+      'senin': <dynamic>[],
+      'selasa': <dynamic>[],
+      'rabu': <dynamic>[],
+      'kamis': <dynamic>[],
+      'jumat': <dynamic>[],
+      'sabtu': <dynamic>[],
+      'minggu': <dynamic>[],
+    });
+  }
 }

@@ -4,6 +4,8 @@ import 'package:manajemenasrama/shared/models/jadwal_kegiatan_list.dart';
 import '../../shared/models/jadwal_kegiatan.dart';
 import '../../services/jadwal_kegiatan_service.dart';
 import '../../services/auth_service.dart';
+import '../../services/user_service.dart';
+import '../../services/asrama_service.dart';
 import '../../core/utils/common_utils.dart';
 import 'jadwal_kegiatan_form_page.dart';
 
@@ -34,16 +36,7 @@ class _JadwalKegiatanPageState extends State<JadwalKegiatanPage> {
 
   late Future<List<JadwalKegiatanList>> _future;
 
-  // Hardcoded sample options for users and asrama as requested
-  final List<Map<String, dynamic>> _sampleUsers = const [
-    {'id': 2, 'full_name': 'missi khumairo'},
-    {'id': 10, 'full_name': 'Missi Khumairo'},
-  ];
-
-  final List<Map<String, dynamic>> _sampleAsrama = const [
-    {'id': 3, 'nama': 'test12345'},
-    {'id': 4, 'nama': 'Asrama B'},
-  ];
+  // We will fetch Ustadzah users and Asrama dynamically when opening the form.
 
   // Sample activity names and categories (kept separate so they can be replaced by API data later)
   final List<String> _sampleActivityNames = const [
@@ -176,13 +169,42 @@ class _JadwalKegiatanPageState extends State<JadwalKegiatanPage> {
   }
 
   Future<void> _openForm({JadwalKegiatanList? existing}) async {
+    // Fetch dynamic options before opening the form. If fetching fails, show error.
+    List<Map<String, dynamic>> users = [];
+    List<Map<String, dynamic>> asrama = [];
+    try {
+      // Use a single AuthService instance and initialize it so the persisted
+      // session (access token) is loaded and included in subsequent requests.
+      final auth = AuthService();
+      await auth.init();
+      final userService = UserService(authService: auth);
+      final asramaService = AsramaService(authService: auth);
+      final ustadzah = await userService.listUstadzah();
+      users = ustadzah
+          .map((p) => {
+                'id': (p['id'] ?? '').toString(),
+                'full_name': (p['full_name'] ?? p['fullName'] ?? '').toString()
+              })
+          .toList(growable: false);
+      final asramaList = await asramaService.list();
+      asrama = asramaList
+          .map((a) => {'id': a.id, 'nama': a.nama})
+          .toList(growable: false);
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text('Gagal memuat data pilihan: $e'),
+        ));
+      }
+    }
+
     final changed = await Navigator.of(context).push<bool>(
       MaterialPageRoute(
         builder: (_) => JadwalKegiatanFormPage(
           service: _service,
           existing: existing,
-          sampleUsers: _sampleUsers,
-          sampleAsrama: _sampleAsrama,
+          sampleUsers: users,
+          sampleAsrama: asrama,
           sampleNames: _sampleActivityNames,
           sampleCategories: _sampleCategories,
         ),

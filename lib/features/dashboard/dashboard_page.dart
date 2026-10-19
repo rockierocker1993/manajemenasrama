@@ -193,7 +193,7 @@ class _DashboardPageState extends State<DashboardPage> {
                         // Role-based access mapping
                         final allowed = <String, List<UserRole>>{
                           'pengguna': [UserRole.superAdmin],
-                          'asrama': [UserRole.superAdmin, UserRole.pengurus],
+                          'asrama': [UserRole.superAdmin, UserRole.pengurus, UserRole.ustadzah],
                           'ijin': [UserRole.ustadzah, UserRole.pengurus],
                           'jadwal': [UserRole.superAdmin, UserRole.pengurus],
                         };

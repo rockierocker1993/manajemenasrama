@@ -163,10 +163,20 @@ class _JadwalKegiatanFormPageState extends State<JadwalKegiatanFormPage> {
           : null,
       'tipe_kegiatan': _tipe,
       if (_selectedUsers.isNotEmpty)
-        'jadwal_kegiatan_user_ids': _selectedUsers.map((e) => e['id']).toList(),
+        'jadwal_kegiatan_user_ids': _selectedUsers
+            .map((e) {
+              final raw = (e['id'] ?? '').toString();
+              final parsed = int.tryParse(raw);
+              return parsed ?? raw;
+            })
+            .toList(),
       if (_selectedAsrama.isNotEmpty)
         'jadwal_kegiatan_asrama_ids': _selectedAsrama
-            .map((e) => e['id'])
+            .map((e) {
+              final raw = (e['id'] ?? '').toString();
+              final parsed = int.tryParse(raw);
+              return parsed ?? raw;
+            })
             .toList(),
     };
 
@@ -441,25 +451,24 @@ class _JadwalKegiatanFormPageState extends State<JadwalKegiatanFormPage> {
                               .toList(),
                         ),
                         const SizedBox(height: 6),
-                        DropdownButtonFormField<int>(
+                        DropdownButtonFormField<String>(
                           decoration: const InputDecoration(
                             labelText: 'Tambah Ustadzah',
                             border: OutlineInputBorder(),
                           ),
                           items: widget.sampleUsers
-                              .map(
-                                (u) => DropdownMenuItem(
-                                  value: u['id'] as int,
-                                  child: Text(u['full_name'] as String),
-                                ),
-                              )
+                              .map((u) => DropdownMenuItem(
+                                    value: (u['id'] ?? '').toString(),
+                                    child: Text((u['full_name'] ?? '').toString()),
+                                  ))
                               .toList(),
                           onChanged: (id) {
+                            if (id == null) return;
                             final sel = widget.sampleUsers.firstWhere(
-                              (e) => e['id'] == id,
+                              (e) => (e['id'] ?? '').toString() == id,
                             );
                             if (!_selectedUsers.any(
-                              (e) => e['id'] == sel['id'],
+                              (e) => (e['id'] ?? '').toString() == (sel['id'] ?? '').toString(),
                             ))
                               setState(() => _selectedUsers.add(sel));
                           },
@@ -485,25 +494,24 @@ class _JadwalKegiatanFormPageState extends State<JadwalKegiatanFormPage> {
                               .toList(),
                         ),
                         const SizedBox(height: 6),
-                        DropdownButtonFormField<int>(
+                        DropdownButtonFormField<String>(
                           decoration: const InputDecoration(
                             labelText: 'Tambah Asrama',
                             border: OutlineInputBorder(),
                           ),
                           items: widget.sampleAsrama
-                              .map(
-                                (a) => DropdownMenuItem(
-                                  value: a['id'] as int,
-                                  child: Text(a['nama'] as String),
-                                ),
-                              )
+                              .map((a) => DropdownMenuItem(
+                                    value: (a['id'] ?? '').toString(),
+                                    child: Text((a['nama'] ?? '').toString()),
+                                  ))
                               .toList(),
                           onChanged: (id) {
+                            if (id == null) return;
                             final sel = widget.sampleAsrama.firstWhere(
-                              (e) => e['id'] == id,
+                              (e) => (e['id'] ?? '').toString() == id,
                             );
                             if (!_selectedAsrama.any(
-                              (e) => e['id'] == sel['id'],
+                              (e) => (e['id'] ?? '').toString() == (sel['id'] ?? '').toString(),
                             ))
                               setState(() => _selectedAsrama.add(sel));
                           },

@@ -38,7 +38,7 @@ class JadwalKegiatanCard extends StatelessWidget {
     );
 
     final upcoming = todaySchedules
-        .where((item) => minutes(item.jamAkhir) > currentMinutes)
+        .where((item) => minutes(item.jamAwal) > currentMinutes)
         .toList();
 
     final nextSchedule = upcoming.isNotEmpty ? upcoming.first : null;
@@ -153,7 +153,7 @@ class JadwalKegiatanCard extends StatelessWidget {
               ),
               _buildBadge(
                 Icons.schedule_rounded,
-                '${upcoming.length} belum selesai',
+                '${upcoming.length} akan datang',
               ),
             ],
           ),

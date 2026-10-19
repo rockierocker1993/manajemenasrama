@@ -45,6 +45,38 @@ class UserService {
         .toList(growable: false);
   }
 
+  /// List users with role USTADZAH (endpoint /api/users/ustadzah).
+  ///
+  /// Returns a list of simple maps with keys `id` and `full_name` to be used
+  /// as dropdown options. The backend may return objects with different
+  /// property names (e.g. `full_name` or `fullName`) so we normalize them here.
+  Future<List<Map<String, dynamic>>> listUstadzah() async {
+    final raw = await _api.getJson('/api/users/ustadzah');
+
+    List itemsRaw;
+    if (raw is Map<String, dynamic>) {
+      final br = BaseResponse<List<dynamic>>.fromJson(
+        raw,
+        (d) => (d as List).cast(),
+      );
+      itemsRaw = br.data ?? <dynamic>[];
+      if (br.status == false) {
+        throw Exception(br.message ?? 'Gagal memuat ustadzah');
+      }
+    } else {
+      itemsRaw = (raw as List? ?? <dynamic>[]);
+    }
+
+    return itemsRaw.cast<Map<String, dynamic>>().map((m) {
+      final id = m['id'] ?? m['user_id'] ?? '';
+      final fullName = m['full_name'] ?? m['fullName'] ?? m['full_name'] ?? '';
+      return {
+        'id': id?.toString() ?? '',
+        'full_name': fullName?.toString() ?? '',
+      };
+    }).toList(growable: false);
+  }
+
   Future<Profile> me() async {
     final raw = await _api.getJson('/api/users/me');
     if (raw is Map<String, dynamic>) {
