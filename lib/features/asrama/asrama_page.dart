@@ -159,7 +159,6 @@ class _AsramaPageState extends State<AsramaPage> {
                 final a = items[i];
                 return ListTile(
                   title: Text(a.nama),
-                  subtitle: Text('ID: ${a.id}'),
                   trailing: PopupMenuButton<String>(
                     onSelected: (v) {
                       if (v == 'edit') _openForm(existing: a);

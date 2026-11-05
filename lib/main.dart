@@ -95,7 +95,7 @@ class _MyAppState extends State<MyApp> {
         : LoginPage(authService: widget.authService);
 
     return MaterialApp(
-      title: 'Manajemen Asrama',
+      title: 'PPNH',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,
       home: MobileApp(child: child),

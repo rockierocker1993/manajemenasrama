@@ -19,9 +19,20 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   final usernameController = TextEditingController();
   final passwordController = TextEditingController();
+  final _usernameFocus = FocusNode();
+  final _passwordFocus = FocusNode();
 
   bool obscure = true;
   bool loading = false;
+
+  @override
+  void dispose() {
+    usernameController.dispose();
+    passwordController.dispose();
+    _usernameFocus.dispose();
+    _passwordFocus.dispose();
+    super.dispose();
+  }
 
   Future<void> login() async {
     setState(() => loading = true);
@@ -97,18 +108,40 @@ class _LoginPageState extends State<LoginPage> {
                         const SizedBox(height: 30),
                         CustomTextField(
                           controller: usernameController,
+                          focusNode: _usernameFocus,
                           hint: 'Username',
                           icon: Icons.verified_user,
+                          textInputAction: TextInputAction.next,
+                          onSubmitted: (_) {
+                            FocusScope.of(context).requestFocus(_passwordFocus);
+                          },
+                          autofillHints: const [AutofillHints.username],
                         ),
                         const SizedBox(height: 18),
                         CustomTextField(
                           controller: passwordController,
+                          focusNode: _passwordFocus,
                           hint: 'Password',
                           icon: Icons.lock_outline,
                           obscure: obscure,
+                          textInputAction: TextInputAction.done,
+                          onSubmitted: (_) {
+                            if (!loading) {
+                              login();
+                            }
+                          },
+                          autofillHints: const [AutofillHints.password],
                           suffix: IconButton(
                             onPressed: () {
+                              final selection = passwordController.selection;
                               setState(() => obscure = !obscure);
+                              WidgetsBinding.instance.addPostFrameCallback((_) {
+                                if (!mounted) return;
+                                _passwordFocus.requestFocus();
+                                if (selection.start >= 0 && selection.end >= 0) {
+                                  passwordController.selection = selection;
+                                }
+                              });
                             },
                             icon: Icon(
                               obscure ? Icons.visibility_off : Icons.visibility,

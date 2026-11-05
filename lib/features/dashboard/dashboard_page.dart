@@ -274,7 +274,7 @@ class _DashboardPageState extends State<DashboardPage> {
                                   padding: const EdgeInsets.only(right: 12.0),
                                   child: buildQuick(
                                     icon: Icons.receipt_long_outlined,
-                                    label: 'Jadwal Kegiatan',
+                                    label: 'Kegiatan',
                                     onTap: () {
                                       Navigator.of(context).push(
                                         MaterialPageRoute(

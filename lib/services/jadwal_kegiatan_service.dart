@@ -140,8 +140,6 @@ class JadwalKegiatanService {
         .toList(growable: false);
   }
 
-  /// Get schedules grouped by day for the current user.
-  /// Returns a [JadwalKegiatanByDay] which contains lists for each weekday.
   Future<JadwalKegiatanByDay> meByDay() async {
     final raw = await _api.getJson('/api/jadwal-kegiatan/me/by-day');
     if (raw is Map<String, dynamic>) {

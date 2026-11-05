@@ -163,60 +163,77 @@ class _IjinPageState extends State<IjinPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const SizedBox(height: 4),
-            Row(
+            Wrap(
+              spacing: 12,
+              runSpacing: 4,
+              crossAxisAlignment: WrapCrossAlignment.center,
               children: [
-                Icon(Icons.calendar_today_outlined, size: 14, color: Colors.grey.shade600),
-                const SizedBox(width: 6),
-                Text('${formatTanggalEffektif(item.tanggalIjin)}', style: const TextStyle(fontSize: 13, color: Colors.black87)),
-                const SizedBox(width: 12),
-                Icon(Icons.label, size: 14, color: Colors.grey.shade600),
-                const SizedBox(width: 6),
-                Text(item.tipeIjin, style: const TextStyle(fontSize: 13, color: Colors.black87)),
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.calendar_today_outlined, size: 14, color: Colors.grey.shade600),
+                    const SizedBox(width: 6),
+                    Text(formatTanggalEffektif(item.tanggalIjin), style: const TextStyle(fontSize: 13, color: Colors.black87)),
+                  ],
+                ),
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.label, size: 14, color: Colors.grey.shade600),
+                    const SizedBox(width: 6),
+                    Text(item.tipeIjin, style: const TextStyle(fontSize: 13, color: Colors.black87)),
+                  ],
+                ),
               ],
             ),
             const SizedBox(height: 8),
             Text(item.alasan, style: const TextStyle(fontSize: 14)),
-          ],
-        ),
-        isThreeLine: true,
-        trailing: Row(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
+            const SizedBox(height: 10),
             AnimatedSwitcher(
               duration: const Duration(milliseconds: 300),
-              transitionBuilder: (child, animation) => ScaleTransition(scale: animation, child: FadeTransition(opacity: animation, child: child)),
-              child: Chip(
+              transitionBuilder: (child, animation) => FadeTransition(
+                opacity: animation,
+                child: ScaleTransition(scale: animation, child: child),
+              ),
+              child: ConstrainedBox(
                 key: ValueKey(statusRaw),
-                avatar: Icon(statusIcon, size: 16, color: statusColor),
-                label: Text(statusLabel, style: TextStyle(color: statusColor, fontWeight: FontWeight.w700, fontSize: 12)),
-                backgroundColor: statusColor.withValues(alpha: 0.12),
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 0),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                constraints: const BoxConstraints(maxWidth: 220),
+                child: Chip(
+                  materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  visualDensity: VisualDensity.compact,
+                  avatar: Icon(statusIcon, size: 14, color: statusColor),
+                  label: Text(
+                    statusLabel,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(color: statusColor, fontWeight: FontWeight.w700, fontSize: 12),
+                  ),
+                  backgroundColor: statusColor.withValues(alpha: 0.12),
+                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 0),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                ),
               ),
             ),
-            if (role == UserRole.pengurus && statusRaw == 'PENDING') ...[
-              const SizedBox(width: 8),
-              if (_processingId == item.id)
-                const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2))
-              else
-                PopupMenuButton<String>(
-                  icon: Icon(Icons.more_vert, color: AppColors.textPrimary),
-                  onSelected: (v) => _approve(item.id, v),
-                  itemBuilder: (_) => [
-                    PopupMenuItem(
-                      value: 'APPROVED',
-                      child: Row(children: const [Icon(Icons.check, color: Colors.green), SizedBox(width: 8), Text('Setujui')]),
-                    ),
-                    PopupMenuItem(
-                      value: 'REJECTED',
-                      child: Row(children: const [Icon(Icons.close, color: Colors.red), SizedBox(width: 8), Text('Tolak')]),
-                    ),
-                  ],
-                ),
-            ],
           ],
         ),
+        trailing: (role == UserRole.pengurus && statusRaw == 'PENDING')
+            ? (_processingId == item.id)
+                  ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2))
+                  : PopupMenuButton<String>(
+                      icon: Icon(Icons.more_vert, color: AppColors.textPrimary),
+                      onSelected: (v) => _approve(item.id, v),
+                      itemBuilder: (_) => [
+                        PopupMenuItem(
+                          value: 'APPROVED',
+                          child: Row(children: const [Icon(Icons.check, color: Colors.green), SizedBox(width: 8), Text('Setujui')]),
+                        ),
+                        PopupMenuItem(
+                          value: 'REJECTED',
+                          child: Row(children: const [Icon(Icons.close, color: Colors.red), SizedBox(width: 8), Text('Tolak')]),
+                        ),
+                      ],
+                    )
+            : null,
       ),
     );
   }
